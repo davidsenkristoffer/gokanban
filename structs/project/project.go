@@ -1,7 +1,7 @@
 package project
 
 import (
-	"gokanban/board"
+	"gokanban/structs/board"
 	"time"
 )
 
