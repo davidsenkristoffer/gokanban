@@ -1,0 +1,20 @@
+{{ define "column" }}
+<div class="column">
+    <h2>Title</h2>
+    <ol class="ordered-list">
+        {{ range .Items }}
+        <li class="ordered-list_listitem">
+            {{ "columnitem" . }}
+        </li>
+        {{ end }}
+    </ol>
+</div>
+{{ end }}
+
+{{ block "columnitem" . }}
+<div class="column_item">
+    <h3>Item title</h3>
+    <p>Item description</p>
+    <p>Time spent: 10h</p>
+</div>
+{{ end }}
