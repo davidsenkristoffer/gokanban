@@ -1,0 +1,15 @@
+{{ define "createnewproject" }}
+<div>
+    <form hx-post="/project/new" hx-target="closest div">
+        Tittel: <input type="text" name="title">
+        Beskrivelse: <textarea rows="4" cols="10" name="description"></textarea>
+        <button type="submit">Opprett</button>
+    </form>
+</div>
+{{ end }}
+
+{{ block "newproject" . }}
+<h2>{{ .Title }}</h2>
+<p>{{ .Description }}</p>
+<p>Opprettet: <time>{{ .Created }}</time></p>
+{{ end }}
