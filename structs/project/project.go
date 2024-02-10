@@ -10,5 +10,5 @@ type Project struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	Created     time.Time `json:"created"`
-	Board       *board.Board
+	Boards      []board.Board
 }

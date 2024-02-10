@@ -40,9 +40,12 @@ func main() {
 
 	e.GET("/", index)
 
-	e.GET("/project/:id", getProject)
 	e.GET("/project/new", newProject)
 	e.POST("/project/new", createProject)
+	e.GET("/project/:id/card", getProject)
+
+	e.GET("/project/:id/board", getProjectBoards)
+	e.POST("/project/:id/board", createProjectBoard)
 
 	e.Logger.Fatal(e.Start(":1337"))
 }
@@ -92,5 +95,14 @@ func createProject(c echo.Context) error {
 		return c.Redirect(303, "/")
 	}
 
-	return c.Redirect(303, "/project/"+strconv.FormatInt(id, 10))
+	return c.Redirect(303, "/project/"+strconv.FormatInt(id, 10)+"/card")
+}
+
+func getProjectBoards(c echo.Context) error {
+	return c.Render(200, "boards", nil)
+}
+
+func createProjectBoard(c echo.Context) error {
+	id := c.Param("id")
+	return c.Redirect(303, "/project/"+id+"/board")
 }

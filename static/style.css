@@ -7,5 +7,13 @@ form {
 
 ul {
     list-style-type: none;
-    columns: 2;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid;
+    border-radius: 0.25em;
+    padding: 1em;
+    max-width: fit-content;
 }

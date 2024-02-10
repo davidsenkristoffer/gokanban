@@ -9,11 +9,13 @@
 
 {{ block "projectcard" . }}
 <li>
-    <div style="display: flex; flex-direction: column; gap: 0.25em;">
-        <h2>{{ .Title }}</h2>
-        <p>{{ .Description }}</p>
-        <p>Opprettet: <time>{{ .Created }}</time></p>
-    </div>
+    <a href="/project/{{ .ID }}">
+        <div class="card">
+            <h2>{{ .Title }}</h2>
+            <p>{{ .Description }}</p>
+            <p>Opprettet: <time>{{ .Created }}</time></p>
+        </div>
+    </a>
 </li>
 {{ end }}
 
@@ -21,7 +23,7 @@
 <div>
     <form hx-post="/project/new" hx-target="previous ul" hx-swap="beforeend">
         Tittel: <input type="text" name="title">
-        Beskrivelse: <textarea rows="4" cols="10" name="description"></textarea>
+        Beskrivelse: <textarea rows="5" cols="10" name="description"></textarea>
         <button type="submit">Opprett</button>
     </form>
 </div>

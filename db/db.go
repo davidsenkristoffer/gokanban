@@ -20,6 +20,7 @@ func Connect() (*sql.DB, error) {
 		created datetime)`
 	boardStmt := `create table if not exists board (
 		id integer not null primary key autoincrement, 
+		title text not null,
 		projectid integer not null, 
 		created datetime, 
 		foreign key (projectid) references project (id) on delete cascade)`
