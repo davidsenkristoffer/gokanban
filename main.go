@@ -36,14 +36,10 @@ func main() {
 	})
 	e.Static("/static", "static")
 
-	e.GET("/", func(c echo.Context) error {
-		return c.Render(200, "index", nil)
-	})
+	e.GET("/", index)
 
 	e.GET("/project/:id", getProject)
-	e.GET("/project/new", func(c echo.Context) error {
-		return c.Render(200, "createnewproject", nil)
-	})
+	e.GET("/project/new", newProject)
 	e.POST("/project/new", createProject)
 
 	e.Logger.Fatal(e.Start(":1337"))
@@ -56,6 +52,14 @@ func catch(err error) {
 	}
 }
 
+func index(c echo.Context) error {
+	projects, err := dbGetProjects(c)
+	if err != nil {
+		return c.Render(500, "fatalerror", err)
+	}
+	return c.Render(200, "index", projects)
+}
+
 func getProject(c echo.Context) error {
 	cc := c.(*kanbanContext)
 	id := c.QueryParam("id")
@@ -66,6 +70,10 @@ func getProject(c echo.Context) error {
 		return c.Render(404, "notfound", "Project with specified id not found")
 	}
 	return c.Render(200, "project", project)
+}
+
+func newProject(c echo.Context) error {
+	return c.Render(200, "createnewproject", nil)
 }
 
 func createProject(c echo.Context) error {
@@ -86,5 +94,27 @@ func createProject(c echo.Context) error {
 		return c.Render(500, "fatalerror", err)
 	}
 
-	return c.Render(200, "newproject", project)
+	return c.Redirect(303, "/")
+}
+
+func dbGetProjects(c echo.Context) ([]project.Project, error) {
+	cc := c.(*kanbanContext)
+	rows, err := cc.db.Query("select * from project")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	projects := []project.Project{}
+
+	for rows.Next() {
+		project := new(project.Project)
+		err = rows.Scan(&project.ID, &project.Title, &project.Description, &project.Created)
+		if err != nil {
+			return nil, err
+		}
+		projects = append(projects, *project)
+	}
+
+	return projects, nil
 }

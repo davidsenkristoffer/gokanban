@@ -1,6 +1,6 @@
 {{ define "createnewproject" }}
 <div>
-    <form hx-post="/project/new" hx-target="closest div">
+    <form hx-post="/project/new" hx-target="body">
         Tittel: <input type="text" name="title">
         Beskrivelse: <textarea rows="4" cols="10" name="description"></textarea>
         <button type="submit">Opprett</button>
@@ -8,8 +8,20 @@
 </div>
 {{ end }}
 
-{{ block "newproject" . }}
-<h2>{{ .Title }}</h2>
-<p>{{ .Description }}</p>
-<p>Opprettet: <time>{{ .Created }}</time></p>
+{{ block "projectcards" . }}
+<ul>
+    {{ range . }}
+    <li>
+        {{ template "projectcard" .}}
+    </li>
+    {{ end }}
+</ul>
+{{ end }}
+
+{{ block "projectcard" . }}
+<div style="display: flex; flex-direction: column; gap: 0.25em;">
+    <h2>{{ .Title }}</h2>
+    <p>{{ .Description }}</p>
+    <p>Opprettet: <time>{{ .Created }}</time></p>
+</div>
 {{ end }}
