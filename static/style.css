@@ -4,3 +4,8 @@ form {
     flex-direction: column;
     max-width: fit-content;
 }
+
+ul {
+    list-style-type: none;
+    columns: 2;
+}

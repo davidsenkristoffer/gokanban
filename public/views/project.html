@@ -1,27 +1,28 @@
-{{ define "createnewproject" }}
-<div>
-    <form hx-post="/project/new" hx-target="body">
-        Tittel: <input type="text" name="title">
-        Beskrivelse: <textarea rows="4" cols="10" name="description"></textarea>
-        <button type="submit">Opprett</button>
-    </form>
-</div>
-{{ end }}
 
 {{ block "projectcards" . }}
 <ul>
     {{ range . }}
-    <li>
-        {{ template "projectcard" .}}
-    </li>
+    {{ template "projectcard" .}}
     {{ end }}
 </ul>
 {{ end }}
 
 {{ block "projectcard" . }}
-<div style="display: flex; flex-direction: column; gap: 0.25em;">
-    <h2>{{ .Title }}</h2>
-    <p>{{ .Description }}</p>
-    <p>Opprettet: <time>{{ .Created }}</time></p>
+<li>
+    <div style="display: flex; flex-direction: column; gap: 0.25em;">
+        <h2>{{ .Title }}</h2>
+        <p>{{ .Description }}</p>
+        <p>Opprettet: <time>{{ .Created }}</time></p>
+    </div>
+</li>
+{{ end }}
+
+{{ define "createnewproject" }}
+<div>
+    <form hx-post="/project/new" hx-target="previous ul" hx-swap="beforeend">
+        Tittel: <input type="text" name="title">
+        Beskrivelse: <textarea rows="4" cols="10" name="description"></textarea>
+        <button type="submit">Opprett</button>
+    </form>
 </div>
 {{ end }}

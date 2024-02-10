@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"gokanban/db"
+	"gokanban/db/dbproject"
 	"gokanban/structs/project"
 	"gokanban/templates"
 	"html/template"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -53,7 +55,7 @@ func catch(err error) {
 }
 
 func index(c echo.Context) error {
-	projects, err := dbGetProjects(c)
+	projects, err := dbproject.GetProjects(c.(*kanbanContext).db)
 	if err != nil {
 		return c.Render(500, "fatalerror", err)
 	}
@@ -61,15 +63,16 @@ func index(c echo.Context) error {
 }
 
 func getProject(c echo.Context) error {
-	cc := c.(*kanbanContext)
-	id := c.QueryParam("id")
-	query := cc.db.QueryRow("select * from project where id = ?", id)
-	project := &project.Project{}
-	var err error
-	if err = query.Scan(&project.ID, &project.Title, &project.Description, &project.Created); err == sql.ErrNoRows {
-		return c.Render(404, "notfound", "Project with specified id not found")
+	id := c.Param("id")
+	if len(id) == 0 {
+		return c.JSON(400, "Bad request")
 	}
-	return c.Render(200, "project", project)
+	project, err := dbproject.GetProject(c.(*kanbanContext).db, id)
+	if err != nil {
+		return c.JSON(404, "Resource not found")
+	}
+
+	return c.Render(200, "projectcard", project)
 }
 
 func newProject(c echo.Context) error {
@@ -77,44 +80,17 @@ func newProject(c echo.Context) error {
 }
 
 func createProject(c echo.Context) error {
-	cc := c.(*kanbanContext)
 	project := &project.Project{
 		Title:       c.FormValue("title"),
 		Description: c.FormValue("description"),
 		Created:     time.Now(),
 	}
-	query, err := cc.db.Prepare("insert into project (title, description, created) values (?, ?, ?)")
+	id, err := dbproject.CreateProject(c.(*kanbanContext).db, *project)
 	if err != nil {
-		return c.Render(500, "fatalerror", err)
-	}
-	defer query.Close()
-
-	_, err = query.Exec(project.Title, project.Description, project.Created)
-	if err != nil {
-		return c.Render(500, "fatalerror", err)
+		return c.JSON(500, "Internal server error")
+	} else if id == -1 {
+		return c.Redirect(303, "/")
 	}
 
-	return c.Redirect(303, "/")
-}
-
-func dbGetProjects(c echo.Context) ([]project.Project, error) {
-	cc := c.(*kanbanContext)
-	rows, err := cc.db.Query("select * from project")
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	projects := []project.Project{}
-
-	for rows.Next() {
-		project := new(project.Project)
-		err = rows.Scan(&project.ID, &project.Title, &project.Description, &project.Created)
-		if err != nil {
-			return nil, err
-		}
-		projects = append(projects, *project)
-	}
-
-	return projects, nil
+	return c.Redirect(303, "/project/"+strconv.FormatInt(id, 10))
 }

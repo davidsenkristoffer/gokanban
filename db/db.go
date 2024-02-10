@@ -43,23 +43,19 @@ func Connect() (*sql.DB, error) {
 		projectid integer not null, 
 		foreign key (projectid) references project (id) on delete cascade)`
 
-	_, err = db.Exec(projectStmt)
-	if err != nil {
+	if _, err = db.Exec(projectStmt); err != nil {
 		return nil, err
 	}
 
-	_, err = db.Exec(boardStmt)
-	if err != nil {
+	if _, err = db.Exec(boardStmt); err != nil {
 		return nil, err
 	}
 
-	_, err = db.Exec(columnStmt)
-	if err != nil {
+	if _, err = db.Exec(columnStmt); err != nil {
 		return nil, err
 	}
 
-	_, err = db.Exec(itemStmt)
-	if err != nil {
+	if _, err = db.Exec(itemStmt); err != nil {
 		return nil, err
 	}
 
