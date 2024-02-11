@@ -1,9 +1,14 @@
 package board
 
-import "time"
+import (
+	"gokanban/structs/column"
+	"time"
+)
 
 type Board struct {
-	ID      int       `json:"id"`
-	Title   string    `json:"title"`
-	Created time.Time `json:"created"`
+	ID        int       `json:"id"`
+	Title     string    `json:"title"`
+	ProjectId int       `json:"projectid"`
+	Created   time.Time `json:"created"`
+	Columns   []column.Column
 }

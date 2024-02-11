@@ -1,6 +1,9 @@
 package column
 
-import "time"
+import (
+	"gokanban/structs/projectitem"
+	"time"
+)
 
 type Column struct {
 	ID          int       `json:"id"`
@@ -8,4 +11,5 @@ type Column struct {
 	ColumnType  int       `json:"columntype"`
 	ColumnOrder int       `json:"columnorder"`
 	Created     time.Time `json:"created"`
+	Items       []projectitem.ProjectItem
 }

@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"gokanban/db"
+	"gokanban/db/dbboard"
 	"gokanban/db/dbproject"
+	"gokanban/structs/board"
 	"gokanban/structs/project"
 	"gokanban/templates"
 	"html/template"
@@ -83,23 +85,57 @@ func newProject(c echo.Context) error {
 }
 
 func createProject(c echo.Context) error {
+	db := c.(*kanbanContext).db
+
 	project := &project.Project{
 		Title:       c.FormValue("title"),
 		Description: c.FormValue("description"),
 		Created:     time.Now(),
 	}
-	id, err := dbproject.CreateProject(c.(*kanbanContext).db, *project)
+
+	projectid, err := dbproject.CreateProject(db, *project)
 	if err != nil {
+		c.Logger().Errorf("Error while creating project: %s", err)
 		return c.JSON(500, "Internal server error")
-	} else if id == -1 {
+	} else if projectid == -1 {
 		return c.Redirect(303, "/")
 	}
 
-	return c.Redirect(303, "/project/"+strconv.FormatInt(id, 10)+"/card")
+	board := &board.Board{
+		Title:     "Standard",
+		Created:   time.Time{},
+		ProjectId: int(projectid),
+	}
+
+	_, err = dbboard.CreateBoard(db, *board)
+	if err != nil {
+		c.Logger().Errorf("Error while creating board for project with id %d: %s", projectid, err)
+		return c.JSON(500, "Internal server error")
+	}
+
+	return c.Redirect(303, "/project/"+strconv.FormatInt(projectid, 10)+"/card")
 }
 
 func getProjectBoards(c echo.Context) error {
-	return c.Render(200, "boards", nil)
+	db := c.(*kanbanContext).db
+	projectid := c.Param("id")
+	if len(projectid) == 0 {
+		return c.JSON(400, "Bad request")
+	}
+
+	project, err := dbproject.GetProject(db, projectid)
+	if err != nil {
+		c.Logger().Errorf("Error while selecting project: %s", err)
+		return c.JSON(404, "Project not found")
+	}
+	boards, err := dbboard.GetBoards(db, projectid)
+	if err != nil {
+		c.Logger().Errorf("Error while selecting boards for project %s: %s", projectid, err)
+	} else {
+		project.Boards = boards
+	}
+
+	return c.Render(200, "boards", project)
 }
 
 func createProjectBoard(c echo.Context) error {

@@ -17,3 +17,16 @@ ul {
     padding: 1em;
     max-width: fit-content;
 }
+
+.columns {
+    background-color: #c6c6c6;
+    display: flex;
+    gap: 2em;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    padding: 0.25em;
+}

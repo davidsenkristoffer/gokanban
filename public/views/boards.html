@@ -1,5 +1,10 @@
 {{ define "boards" }}
-<div>
-
-</div>
+<main>
+    <h1>{{ .Title }}</h1>
+    <div class="columns">
+        {{ range .Boards }}
+        {{ template "column" . }}
+        {{ end }}
+    </div>
+</main>
 {{ end }}
