@@ -8,8 +8,7 @@ import (
 func GetProject(db *sql.DB, id string) (*project.Project, error) {
 	query := db.QueryRow("select * from project where id = ?", id)
 	project := &project.Project{}
-	var err error
-	if err = query.Scan(&project.ID, &project.Title, &project.Description, &project.Created); err == sql.ErrNoRows {
+	if err := query.Scan(&project.ID, &project.Title, &project.Description, &project.Created); err == sql.ErrNoRows {
 		return nil, err
 	}
 	return project, nil

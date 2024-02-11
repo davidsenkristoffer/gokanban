@@ -24,14 +24,14 @@ func Init(database *sql.DB) *echo.Echo {
 
 	e.GET("/", index)
 
-	e.Group("/project")
+	project := e.Group("/project")
 	{
-		e.GET("/new", newProject)
-		e.POST("/new", createProject)
-		e.GET("/:id/card", getProject)
+		project.GET("/new", newProject)
+		project.POST("/new", createProject)
+		project.GET("/:id/card", getProject)
 
-		e.GET("/:id/board", getProjectBoards)
-		e.POST("/:id/board", createProjectBoard)
+		project.GET("/:id/board", getProjectBoards)
+		project.POST("/:id/board", createProjectBoard)
 	}
 
 	return e
