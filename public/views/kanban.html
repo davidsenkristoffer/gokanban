@@ -1,10 +1,10 @@
-{{ define "column" }}
+{{ block "column" . }}
 <div class="column">
     <h2>Title</h2>
     <ol class="ordered-list">
         {{ range .Columns }}
         <li class="ordered-list_listitem">
-            {{ "columnitem" . }}
+            {{ template "columnitem" . }}
         </li>
         {{ end }}
     </ol>
@@ -17,4 +17,16 @@
     <p>Item description</p>
     <p>Time spent: 10h</p>
 </div>
+{{ end }}
+
+{{ define "kanban" }}
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/style.css">
+        <script defer src="/static/htmx.min.js"></script>
+    </head>
+    <body hx-boost="true">
+        {{ template "project" . }}
+    </body>
+</html>
 {{ end }}

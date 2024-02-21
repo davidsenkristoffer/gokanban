@@ -1,11 +1,13 @@
 package route
 
 import (
+	"cmp"
 	"gokanban/db/dbboard"
 	"gokanban/db/dbcolumn"
 	"gokanban/db/dbproject"
 	"gokanban/structs/board"
 	"gokanban/structs/column"
+	"slices"
 	"strconv"
 	"time"
 
@@ -27,11 +29,24 @@ func getProjectBoards(c echo.Context) error {
 	boards, err := dbboard.GetBoards(db, projectid)
 	if err != nil {
 		c.Logger().Errorf("Error while selecting boards for project %s: %s", projectid, err)
-	} else {
-		project.Boards = boards
 	}
 
-	return c.Render(200, "boards", project)
+	for i, b := range boards {
+		columns, err := dbcolumn.GetColumns(db, b)
+		if err != nil {
+			c.Logger().Errorf("Error while selecting columns for board %d: %s", b.ID, err)
+		}
+		slices.SortFunc(columns, compareColumnOrder)
+		boards[i].Columns = append(boards[i].Columns, columns...)
+	}
+	project.Boards = boards
+
+	hxReq := c.Request().Header.Get("HX-Request")
+	if len(hxReq) > 0 {
+		return c.Render(200, "project", project)
+	} else {
+		return c.Render(200, "kanban", project)
+	}
 }
 
 func createProjectBoard(c echo.Context) error {
@@ -90,4 +105,8 @@ func getStandardColumns(boardid int64) []column.Column {
 			BoardId:     boardid,
 		},
 	}
+}
+
+func compareColumnOrder(a, b column.Column) int {
+	return cmp.Compare(a.ColumnOrder, b.ColumnOrder)
 }

@@ -17,7 +17,7 @@ func GetColumns(db *sql.DB, board board.Board) ([]column.Column, error) {
 
 	for rows.Next() {
 		column := &column.Column{}
-		err = rows.Scan(&column.ID, &column.Title, &column.ColumnOrder, &column.ColumnType, &column.Created)
+		err = rows.Scan(&column.ID, &column.Title, &column.ColumnType, &column.ColumnOrder, &column.BoardId, &column.Created)
 		if err != nil {
 			return nil, err
 		}

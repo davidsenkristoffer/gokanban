@@ -2,6 +2,7 @@ package route
 
 import (
 	"gokanban/db/dbboard"
+	"gokanban/db/dbcolumn"
 	"gokanban/db/dbproject"
 	"gokanban/structs/board"
 	"gokanban/structs/project"
@@ -59,10 +60,19 @@ func createProject(c echo.Context) error {
 		ProjectId: int(projectid),
 	}
 
-	_, err = dbboard.CreateBoard(db, *board)
+	boardid, err := dbboard.CreateBoard(db, *board)
 	if err != nil {
 		c.Logger().Errorf("Error while creating board for project with id %d: %s", projectid, err)
 		return c.JSON(500, "Internal server error")
+	}
+
+	columns := getStandardColumns(boardid)
+	for _, column := range columns {
+		_, err := dbcolumn.CreateColumn(db, column)
+		if err != nil {
+			c.Logger().Errorf("Error while creating column for board with id %d: %s", boardid, err)
+			return c.JSON(500, "Internal server error")
+		}
 	}
 
 	return c.Redirect(303, "/project/"+strconv.FormatInt(projectid, 10)+"/card")
