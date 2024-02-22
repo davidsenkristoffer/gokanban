@@ -41,8 +41,7 @@ func Connect() (*sql.DB, error) {
 		created datetime, 
 		updated datetime, 
 		columnid integer not null, 
-		projectid integer not null, 
-		foreign key (projectid) references project (id) on delete cascade)`
+		foreign key (columnid) references column (id))`
 
 	if _, err = db.Exec(projectStmt); err != nil {
 		return nil, err

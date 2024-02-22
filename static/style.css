@@ -22,6 +22,10 @@ ul, ol {
     list-style-type: none;
 }
 
+.projectitems_list {
+    padding: 0;
+}
+
 details {
     background-color: rgb(159 209 255 / 60%);
     border-top: 0.125em solid black;
@@ -52,8 +56,6 @@ details[open] > summary {
     padding: 1em;
     max-width: fit-content;
 }
-
-.board {}
 
 .board_summary {
     font-size: x-large;

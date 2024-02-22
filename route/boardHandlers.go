@@ -5,6 +5,7 @@ import (
 	"gokanban/db/dbboard"
 	"gokanban/db/dbcolumn"
 	"gokanban/db/dbproject"
+	"gokanban/db/dbprojectitem"
 	"gokanban/structs/board"
 	"gokanban/structs/column"
 	"slices"
@@ -36,6 +37,15 @@ func getProjectBoards(c echo.Context) error {
 		if err != nil {
 			c.Logger().Errorf("Error while selecting columns for board %d: %s", b.ID, err)
 		}
+
+		for j, col := range columns {
+			items, err := dbprojectitem.GetProjectItems(db, col.ID)
+			if err != nil {
+				c.Logger().Errorf("Error while selecting projectitems for column &d: &s", col.ID, err)
+			}
+			columns[j].Items = append(columns[j].Items, items...)
+		}
+
 		slices.SortFunc(columns, compareColumnOrder)
 		boards[i].Columns = append(boards[i].Columns, columns...)
 	}

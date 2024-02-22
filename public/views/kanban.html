@@ -1,22 +1,19 @@
-{{ block "column" . }}
-<div class="column">
-    <h2>Title</h2>
-    <ol class="ordered-list">
-        {{ range .Columns }}
-        <li class="ordered-list_listitem">
-            {{ template "columnitem" . }}
-        </li>
-        {{ end }}
-    </ol>
+{{ block "projectitem" . }}
+<div class="column_item">
+    <h3>{{ .Title }}</h3>
+    <p>{{ .Description }}</p>
+    <p>Time estimated: {{ .EstimatedTime }}</p>
+    <p>Time spent: {{ .SpentTime }}</p>
 </div>
 {{ end }}
 
-{{ block "columnitem" . }}
-<div class="column_item">
-    <h3>Item title</h3>
-    <p>Item description</p>
-    <p>Time spent: 10h</p>
-</div>
+{{ block "createprojectitem" . }}
+<form hx-post="/projectitem/{{ . }}/new">
+    Tittel: <input type="text" name="title">
+    Beskrivelse: <textarea name="description" cols="10" rows="10"></textarea>
+    Estimert tidsbruk: <input type="number" name="estimatedtime">
+    <button type="submit">Opprett</button>
+</form>
 {{ end }}
 
 {{ define "kanban" }}
