@@ -1,6 +1,7 @@
 package route
 
 import (
+	"gokanban/components"
 	"gokanban/db/dbprojectitem"
 	"gokanban/structs/projectitem"
 	"strconv"
@@ -14,7 +15,10 @@ func getProjectItem(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Render(200, "projectitem", p)
+
+	cmp := components.ProjectItem(*p.ToViewModel())
+
+	return View(c, cmp)
 }
 
 func createProjectItem(c echo.Context) error {
@@ -43,5 +47,10 @@ func createProjectItem(c echo.Context) error {
 }
 
 func CreateProjectItemForm(c echo.Context) error {
-	return c.Render(200, "createprojectitem", c.Param("columnid"))
+	id := c.Param("columnid")
+	if _, err := strconv.ParseInt(id, 10, 64); err != nil {
+		return c.JSON(400, "Bad request")
+	}
+	cmp := components.CreateProjectItem(id)
+	return View(c, cmp)
 }

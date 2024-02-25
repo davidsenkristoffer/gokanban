@@ -2,8 +2,99 @@ package components
 
 import (
     "gokanban/structs/board"
+	"gokanban/structs/project"
+    "gokanban/structs/column"
+	"fmt"
+	"gokanban/structs/projectitem"
 )
 
-templ Boards(b []board.BoardViewModel) {
-    
+templ Kanban(p project.ProjectViewModel) {
+    <html>
+        <head>
+            <link rel="stylesheet" href="/static/style.css" />
+            <script defer src="/static/htmx.min.js"></script>
+        </head>
+        <body hx-boost="true">
+            @Boards(p)
+        </body>
+    </html>
+}
+
+templ Boards(p project.ProjectViewModel) {
+    <main>
+        <h1>{ p.Title }</h1>
+        <div class="boards">
+            for i, b := range p.Boards {
+                @Board(b, i)            
+            }
+        </div>
+    </main>    
+}
+
+templ Board(b board.BoardViewModel, i int) {
+    <details open class="board">
+        <summary class="board_summary">
+            { b.Title }
+        </summary>
+        @Columns(b.Columns)
+    </details>
+}
+
+templ Columns(c []column.ColumnViewModel) {
+    <ol class="columns">
+        for i, col := range c {
+            @Column(col, i)
+        }
+    </ol>
+}
+
+templ Column(col column.ColumnViewModel, i int) {
+    <li>
+        <div class={ getColumnStyle(col) }>
+            <h3>{ col.Title }</h3>
+            @ProjectItems(col.ProjectItems)
+            <button 
+                hx-get={ fmt.Sprintf("/projectitem/%s/new", col.Id) } 
+                hx-swap="outerHTML">
+                Opprett ny sak
+            </button>
+        </div>
+    </li>
+}
+
+templ ProjectItems(items []projectitem.ProjectItemViewModel) {
+    <ol class="projectitems_list">
+        for _, p := range items {
+            @ProjectItem(p)
+        }
+    </ol>
+}
+
+templ ProjectItem(p projectitem.ProjectItemViewModel) {
+    <div class="projectitem">
+        <h3>{ p.Title }</h3>
+        <p>{ p.Description }</p>
+        <p>Time estimated: { p.EstimatedTime }</p>
+        <p>Time spent: { p.SpentTime }</p>
+    </div>
+}
+
+templ CreateProjectItem(id string) {
+    <form hx-post={ fmt.Sprintf("/projectitem/%s/new", id) }>
+        Tittel: <input type="text" name="title" />
+        Beskrivelse: <textarea name="description" cols="10" rows="10"></textarea>
+        Estimert tidsbruk: <input type="number" name="estimatedtime" />
+        <button type="submit">Opprett</button>
+    </form>
+}
+
+func getColumnStyle(c column.ColumnViewModel) string {
+    switch c.ColumnType {
+        case 0:
+            return "column column_nil"
+        case 1:
+            return "column column_one"
+        default:
+            return "column column_two"
+    }
 }

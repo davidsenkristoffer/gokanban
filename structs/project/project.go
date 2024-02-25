@@ -23,11 +23,15 @@ type ProjectViewModel struct {
 }
 
 func (p Project) ToViewModel() *ProjectViewModel {
+	boards := []board.BoardViewModel{}
+	for _, b := range p.Boards {
+		boards = append(boards, *b.ToViewModel())
+	}
 	return &ProjectViewModel{
 		Id:          strconv.Itoa(p.ID),
 		Title:       p.Title,
 		Description: p.Description,
 		Created:     p.Created.In(t.Local).Format("dd.MM.yyyy"),
-		Boards:      []board.BoardViewModel{},
+		Boards:      boards,
 	}
 }

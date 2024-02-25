@@ -2,8 +2,6 @@ package route
 
 import (
 	"database/sql"
-	"gokanban/templates"
-	"html/template"
 
 	"github.com/labstack/echo/v4"
 )
@@ -11,9 +9,6 @@ import (
 func Init(database *sql.DB) *echo.Echo {
 	e := echo.New()
 
-	e.Renderer = &templates.Template{
-		Templates: template.Must(template.ParseGlob("public/views/*.html")),
-	}
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cc := &kanbanContext{c, database}

@@ -2,6 +2,7 @@ package route
 
 import (
 	"cmp"
+	"gokanban/components"
 	"gokanban/db/dbboard"
 	"gokanban/db/dbcolumn"
 	"gokanban/db/dbproject"
@@ -12,13 +13,14 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
 
 func getProjectBoards(c echo.Context) error {
 	db := c.(*kanbanContext).db
 	projectid := c.Param("id")
-	if len(projectid) == 0 {
+	if _, err := strconv.ParseInt(projectid, 10, 64); err != nil {
 		return c.JSON(400, "Bad request")
 	}
 
@@ -51,12 +53,16 @@ func getProjectBoards(c echo.Context) error {
 	}
 	project.Boards = boards
 
+	pvm := project.ToViewModel()
+	var cmp templ.Component
+
 	hxReq := c.Request().Header.Get("HX-Request")
 	if len(hxReq) > 0 {
-		return c.Render(200, "project", project)
+		cmp = components.Boards(*pvm)
 	} else {
-		return c.Render(200, "kanban", project)
+		cmp = components.Kanban(*pvm)
 	}
+	return View(c, cmp)
 }
 
 func createProjectBoard(c echo.Context) error {
