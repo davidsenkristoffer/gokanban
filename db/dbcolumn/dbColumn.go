@@ -2,13 +2,11 @@ package dbcolumn
 
 import (
 	"database/sql"
-	"gokanban/structs/board"
 	"gokanban/structs/column"
-	"gokanban/structs/projectitem"
 )
 
-func GetColumns(db *sql.DB, board board.Board) ([]column.Column, error) {
-	rows, err := db.Query("select * from column where boardid = ?", board.ID)
+func GetColumns(db *sql.DB, id string) ([]column.Column, error) {
+	rows, err := db.Query("select * from column where boardid = ?", id)
 	if err != nil {
 		return nil, err
 	}
@@ -24,29 +22,6 @@ func GetColumns(db *sql.DB, board board.Board) ([]column.Column, error) {
 		columns = append(columns, *column)
 	}
 
-	for _, c := range columns {
-		itemRows, err := db.Query("select * from projectitem inner join column where projectitem.columnid = ?", c.ID)
-		if err != nil {
-			return columns, nil
-		}
-		defer itemRows.Close()
-
-		for rows.Next() {
-			projectitem := &projectitem.ProjectItem{}
-			err = rows.Scan(
-				&projectitem.ID,
-				&projectitem.Title,
-				&projectitem.Description,
-				&projectitem.EstimatedTime,
-				&projectitem.SpentTime,
-				&projectitem.Updated,
-				&projectitem.Created)
-			if err != nil {
-				continue
-			}
-			c.Items = append(c.Items, *projectitem)
-		}
-	}
 	return columns, nil
 }
 

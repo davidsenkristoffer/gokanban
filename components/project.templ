@@ -6,7 +6,7 @@ import (
 )
 
 templ Projectcards(items []project.ProjectViewModel) {
-    <ul>
+    <ul class="projectcards">
         for _, p := range items {
             @Projectcard(p)
         }

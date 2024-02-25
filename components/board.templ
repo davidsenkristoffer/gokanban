@@ -12,7 +12,20 @@ templ Kanban(p project.ProjectViewModel) {
     <html>
         <head>
             <link rel="stylesheet" href="/static/style.css" />
-            <script defer src="/static/htmx.min.js"></script>
+            <script src="/static/htmx.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+            <script>
+                htmx.onLoad(function(content) {
+                    let sortables = document.querySelectorAll(".sortable");
+                    for (let i = 0; i < sortables.length; i++) {
+                        let sortable = sortables[i];
+                        new Sortable(sortable, {
+                            animation: 150,
+                            group: 'cols'
+                        });
+                    }
+                })
+            </script>
         </head>
         <body hx-boost="true">
             @Boards(p)
@@ -36,30 +49,41 @@ templ Board(b board.BoardViewModel, i int) {
         <summary class="board_summary">
             { b.Title }
         </summary>
-        @Columns(b.Columns)
+        <div class="details_content">
+            @Columns(b)
+        </div>
     </details>
 }
 
-templ Columns(c []column.ColumnViewModel) {
+templ Columns(b board.BoardViewModel) {
     <ol class="columns">
-        for i, col := range c {
-            @Column(col, i)
+        for i, col := range b.Columns {
+            <li>
+                @Column(col)
+            </li>
+            if i == 0 {
+                <button 
+                    hx-get={ fmt.Sprintf("/projectitem/%s/new", col.Id) } 
+                    hx-swap="outerHTML">
+                    Opprett ny sak
+                </button>
+            }
         }
+        <button 
+            hx-get={fmt.Sprintf("/board/%s/columns/edit", b.Id)}
+            hx-target=".columns"
+            hx-swap="outerHTML">
+            Rediger
+        </button>
     </ol>
 }
 
-templ Column(col column.ColumnViewModel, i int) {
-    <li>
-        <div class={ getColumnStyle(col) }>
-            <h3>{ col.Title }</h3>
-            @ProjectItems(col.ProjectItems)
-            <button 
-                hx-get={ fmt.Sprintf("/projectitem/%s/new", col.Id) } 
-                hx-swap="outerHTML">
-                Opprett ny sak
-            </button>
-        </div>
-    </li>
+
+templ Column(col column.ColumnViewModel) {
+    <div class={ getColumnStyle(col) }>
+        <h3>{ col.Title }</h3>
+        @ProjectItems(col.ProjectItems)
+    </div>
 }
 
 templ ProjectItems(items []projectitem.ProjectItemViewModel) {
@@ -73,19 +97,37 @@ templ ProjectItems(items []projectitem.ProjectItemViewModel) {
 templ ProjectItem(p projectitem.ProjectItemViewModel) {
     <div class="projectitem">
         <h3>{ p.Title }</h3>
-        <p>{ p.Description }</p>
+        if len(p.Description) > 0 {
+            <p>{ p.Description }</p>
+        }
         <p>Time estimated: { p.EstimatedTime }</p>
         <p>Time spent: { p.SpentTime }</p>
     </div>
 }
 
 templ CreateProjectItem(id string) {
-    <form hx-post={ fmt.Sprintf("/projectitem/%s/new", id) }>
+    <form hx-post={ fmt.Sprintf("/projectitem/%s/new", id) } 
+        hx-target="previous ol"
+        hx-swap="beforeend">
         Tittel: <input type="text" name="title" />
         Beskrivelse: <textarea name="description" cols="10" rows="10"></textarea>
         Estimert tidsbruk: <input type="number" name="estimatedtime" />
         <button type="submit">Opprett</button>
     </form>
+}
+
+templ EditColumns(b board.BoardViewModel) {
+        <form hx-post={fmt.Sprintf("/board/%s/columns/edit", b.Id)}
+            hx-trigger="end">
+            <ol class="columns">
+            for _, col := range b.Columns {
+                <li class="sortable">
+                    <input type="hidden" name="item" value={ col.Id } />
+                    @Column(col)
+                </li>
+            }
+            </ol>
+        </form>
 }
 
 func getColumnStyle(c column.ColumnViewModel) string {

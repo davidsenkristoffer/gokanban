@@ -29,6 +29,12 @@ func Init(database *sql.DB) *echo.Echo {
 		project.POST("/:id/board", createProjectBoard)
 	}
 
+	board := e.Group("/board")
+	{
+		board.GET("/:boardid/columns/edit", editBoardColumns)
+		board.POST("/:boardid/columns/edit", updateBoardColumns)
+	}
+
 	projectitem := e.Group("/projectitem")
 	{
 		projectitem.GET("/:columnid/new", CreateProjectItemForm)
