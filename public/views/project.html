@@ -1,34 +1,3 @@
-
-{{ block "projectcards" . }}
-<ul>
-    {{ range . }}
-    {{ template "projectcard" .}}
-    {{ end }}
-</ul>
-{{ end }}
-
-{{ block "projectcard" . }}
-<li>
-    <a href="/project/{{ .ID }}/board">
-        <div class="card">
-            <h2>{{ .Title }}</h2>
-            <p>{{ .Description }}</p>
-            <p>Opprettet: <time>{{ .Created }}</time></p>
-        </div>
-    </a>
-</li>
-{{ end }}
-
-{{ define "createnewproject" }}
-<div>
-    <form hx-post="/project/new" hx-target="previous ul" hx-swap="beforeend">
-        Tittel: <input type="text" name="title">
-        Beskrivelse: <textarea rows="5" cols="10" name="description"></textarea>
-        <button type="submit">Opprett</button>
-    </form>
-</div>
-{{ end }}
-
 {{ define "project" }}
 <main>
     <h1>{{ .Title }}</h1>

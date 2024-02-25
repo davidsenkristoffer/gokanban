@@ -1,6 +1,7 @@
 package route
 
 import (
+	"gokanban/components"
 	"gokanban/db/dbboard"
 	"gokanban/db/dbcolumn"
 	"gokanban/db/dbproject"
@@ -9,20 +10,28 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 )
 
 func index(c echo.Context) error {
 	projects, err := dbproject.GetProjects(c.(*kanbanContext).db)
 	if err != nil {
-		return c.Render(500, "fatalerror", err)
+		return c.JSON(404, "Resource not found")
 	}
-	return c.Render(200, "index", projects)
+	pvms := []project.ProjectViewModel{}
+	for _, p := range projects {
+		pvms = append(pvms, *p.ToViewModel())
+	}
+
+	cmp := components.Index(pvms)
+	return View(c, cmp)
 }
 
 func getProject(c echo.Context) error {
 	id := c.Param("id")
-	if len(id) == 0 {
+	if _, err := strconv.ParseInt(id, 10, 64); err != nil {
+		c.Logger().Errorf("Param \"id\" was not formatted correctly. Received value: %s", id)
 		return c.JSON(400, "Bad request")
 	}
 	project, err := dbproject.GetProject(c.(*kanbanContext).db, id)
@@ -30,11 +39,14 @@ func getProject(c echo.Context) error {
 		return c.JSON(404, "Resource not found")
 	}
 
-	return c.Render(200, "projectcard", project)
+	pvm := project.ToViewModel()
+	cmp := components.Projectcard(*pvm)
+	return View(c, cmp)
 }
 
 func newProject(c echo.Context) error {
-	return c.Render(200, "createnewproject", nil)
+	cmp := components.CreateNewProject()
+	return View(c, cmp)
 }
 
 func createProject(c echo.Context) error {
@@ -56,7 +68,7 @@ func createProject(c echo.Context) error {
 
 	board := &board.Board{
 		Title:     "Standard",
-		Created:   time.Time{},
+		Created:   time.Now(),
 		ProjectId: int(projectid),
 	}
 
@@ -76,4 +88,8 @@ func createProject(c echo.Context) error {
 	}
 
 	return c.Redirect(303, "/project/"+strconv.FormatInt(projectid, 10)+"/card")
+}
+
+func View(c echo.Context, cmp templ.Component) error {
+	return cmp.Render(c.Request().Context(), c.Response().Writer)
 }
