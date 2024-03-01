@@ -44,6 +44,14 @@ ul, ol {
     border-radius: 0.25em;
 }
 
+.projectitem > h3 {
+    margin: 1em 0;
+}
+
+.projectitem > p {
+    margin: 0.25em 0;
+}
+
 .sortable {
     min-height: 2em;
     width: auto;

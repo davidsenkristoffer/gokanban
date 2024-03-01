@@ -13,10 +13,16 @@ templ Kanban(p project.ProjectViewModel) {
         <head>
             <link rel="stylesheet" href="/static/style.css" />
             <script src="/static/htmx.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
         </head>
         <body hx-boost="true">
-            @Boards(p)
+            <main>
+                <h1>{ p.Title }</h1>
+                <div class="boards">
+                    for i, b := range p.Boards {
+                        @Board(b, i)            
+                    }
+                </div>
+            </main>    
         </body>
     </html>
 }
@@ -38,19 +44,15 @@ templ Board(b board.BoardViewModel, i int) {
             { b.Title }
         </summary>
         <div class="details_content">
-            @Columns(b)
+            <ol class="columns">
+                for i, col := range b.Columns {
+                    <li>
+                        @Column(col, i)
+                    </li>
+                }
+            </ol>
         </div>
     </details>
-}
-
-templ Columns(b board.BoardViewModel) {
-    <ol class="columns">
-        for i, col := range b.Columns {
-            <li>
-                @Column(col, i)
-            </li>
-        }
-    </ol>
 }
 
 templ Column(col column.ColumnViewModel, i int) {
@@ -66,31 +68,26 @@ templ ProjectItems(col column.ColumnViewModel, i int) {
             @ProjectItem(p, false)
         }
     if i == 0 {
-        <button
-            hx-get={ fmt.Sprintf("/projectitem/%s/new", col.Id) } 
-            hx-swap="outerHTML">
-            @Plus()
-        </button>
+        @Plus(fmt.Sprintf("/projectitem/%s/new", col.Id), "outerHTML")
     }
     </ol>
 }
 
 templ ProjectItem(p projectitem.ProjectItemViewModel, isHXRequest bool) {
-    <div class="projectitem">
+    <div class="projectitem" id={ "projectitem-" + p.Id }>
         <h3>{ p.Title }</h3>
         if len(p.Description) > 0 {
             <p>{ p.Description }</p>
         }
         <p>Time estimated: { p.EstimatedTime }</p>
         <p>Time spent: { p.SpentTime }</p>
+        <div class="projectitem_toolbar">
+            @EditIcon("", "outerHTML")
+            @DeleteIcon(fmt.Sprintf("/projectitem/%s", p.Id), "delete", fmt.Sprintf("#projectitem-%s", p.Id))
+        </div>
     </div>
     if isHXRequest {
-        <button
-            id="createprojectitem"
-            hx-get={ fmt.Sprintf("/projectitem/%s/new", p.ColumnId) }
-            hx-swap="outerHTML">
-            @Plus()
-        </button>
+        @Plus(fmt.Sprintf("/projectitem/%s/new", p.ColumnId), "outerHTML")
     }
 }
 

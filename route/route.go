@@ -31,9 +31,10 @@ func Init(database *sql.DB) *echo.Echo {
 
 	projectitem := e.Group("/projectitem")
 	{
-		projectitem.GET("/:columnid/new", CreateProjectItemForm)
+		projectitem.GET("/:columnid/new", createProjectItemForm)
 		projectitem.POST("/:columnid/new", createProjectItem)
 		projectitem.GET("/:projectitemid", getProjectItem)
+		projectitem.DELETE("/:projectitemid", deleteProjectItem)
 	}
 
 	return e

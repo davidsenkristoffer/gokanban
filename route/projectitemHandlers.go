@@ -47,11 +47,27 @@ func createProjectItem(c echo.Context) error {
 	return c.Redirect(303, "/projectitem/"+strconv.FormatInt(id, 10))
 }
 
-func CreateProjectItemForm(c echo.Context) error {
+func deleteProjectItem(c echo.Context) error {
+	db := c.(*kanbanContext).db
+	projectitemid, err := strconv.ParseInt(c.Param("projectitemid"), 10, 64)
+	if err != nil {
+		return err
+	}
+
+	_, err = dbprojectitem.DeleteProjectItem(db, int(projectitemid))
+	if err != nil {
+		return c.NoContent(500)
+	}
+
+	return c.NoContent(200)
+}
+
+func createProjectItemForm(c echo.Context) error {
 	id := c.Param("columnid")
 	if _, err := strconv.ParseInt(id, 10, 64); err != nil {
 		return c.JSON(400, "Bad request")
 	}
 	cmp := components.CreateProjectItem(id)
+	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
 	return View(c, cmp)
 }
