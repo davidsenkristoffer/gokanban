@@ -44,6 +44,12 @@ ul, ol {
     border-radius: 0.25em;
 }
 
+.sortable {
+    min-height: 2em;
+    width: auto;
+    border: 0.5px dotted black;
+}
+
 details {
     background-color: rgb(159 209 255 / 60%);
     border-top: 0.125em solid black;
@@ -84,7 +90,8 @@ details[open] > summary {
     display: flex;
     gap: 2.5em;
     padding: 0.5em 1em;
-    height: clamp(50vh, 75vh, 85vh);
+    height: auto;
+    min-height: 50vh;
 }
 
 .column {

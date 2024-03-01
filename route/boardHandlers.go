@@ -97,45 +97,6 @@ func createProjectBoard(c echo.Context) error {
 	return c.Redirect(303, "/project/"+id+"/board")
 }
 
-func editBoardColumns(c echo.Context) error {
-	id := c.Param("boardid")
-	boardid, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
-		return c.JSON(400, "Bad request")
-	}
-	db := c.(*kanbanContext).db
-
-	board, err := dbboard.GetBoard(db, int(boardid))
-	if err != nil {
-		c.Logger().Errorf("Error while selecting board %s: %s", id, err)
-	}
-
-	columns, err := dbcolumn.GetColumns(db, id)
-	if err != nil {
-		return c.JSON(404, "Not found")
-	}
-
-	for j, col := range columns {
-		items, err := dbprojectitem.GetProjectItems(db, col.ID)
-		if err != nil {
-			c.Logger().Errorf("Error while selecting projectitems for column &d: &s", col.ID, err)
-		}
-		columns[j].Items = append(columns[j].Items, items...)
-	}
-
-	slices.SortFunc(columns, compareColumnOrder)
-	board.Columns = columns
-
-	bvm := board.ToViewModel()
-
-	cmp := components.EditColumns(*bvm)
-	return View(c, cmp)
-}
-
-func updateBoardColumns(c echo.Context) error {
-	return c.JSON(200, c.FormValue("item"))
-}
-
 func getStandardColumns(boardid int64) []column.Column {
 	return []column.Column{
 		{

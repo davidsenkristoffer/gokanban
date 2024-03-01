@@ -16,7 +16,8 @@ func getProjectItem(c echo.Context) error {
 		return err
 	}
 
-	cmp := components.ProjectItem(*p.ToViewModel())
+	hxReq := c.Request().Header.Get("HX-Request")
+	cmp := components.ProjectItem(*p.ToViewModel(), len(hxReq) > 0)
 
 	return View(c, cmp)
 }
