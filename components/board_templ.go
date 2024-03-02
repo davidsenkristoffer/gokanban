@@ -31,14 +31,14 @@ func Kanban(p project.ProjectViewModel) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<html><head><link rel=\"stylesheet\" href=\"/static/style.css\"><script src=\"/static/htmx.min.js\"></script></head><body hx-boost=\"true\"><main><h1>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<html><head><link rel=\"stylesheet\" href=\"/static/style.css\"><script src=\"/static/htmx.min.js\"></script><meta name=\"htmx-config\" content=\"{&#34;globalViewTransitions&#34;:&#34;true&#34;}\"></head><body hx-boost=\"true\"><main><h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(p.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 18, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 19, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -85,7 +85,7 @@ func Boards(p project.ProjectViewModel) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(p.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 31, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 32, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -140,7 +140,7 @@ func Board(b board.BoardViewModel) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(b.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 43, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 44, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -208,7 +208,7 @@ func Column(col column.ColumnViewModel, i int) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(col.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 59, Col: 23}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 60, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -301,7 +301,7 @@ func ProjectItem(p projectitem.ProjectItemViewModel, boardid string, isHXRequest
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(p.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 77, Col: 21}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 78, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -319,7 +319,7 @@ func ProjectItem(p projectitem.ProjectItemViewModel, boardid string, isHXRequest
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(p.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 79, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 80, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -337,7 +337,7 @@ func ProjectItem(p projectitem.ProjectItemViewModel, boardid string, isHXRequest
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(p.EstimatedTime)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 81, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 82, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -350,7 +350,7 @@ func ProjectItem(p projectitem.ProjectItemViewModel, boardid string, isHXRequest
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(p.SpentTime)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 82, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components\board.templ`, Line: 83, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
