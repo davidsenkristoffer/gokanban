@@ -35,6 +35,8 @@ func Init(database *sql.DB) *echo.Echo {
 		projectitem.POST("/:columnid/new", createProjectItem)
 		projectitem.GET("/:projectitemid", getProjectItem)
 		projectitem.DELETE("/:projectitemid", deleteProjectItem)
+		projectitem.PUT("/:projectitemid/edit", updateProjectItem)
+		projectitem.GET("/:projectitemid/edit", updateProjectItemForm)
 	}
 
 	return e

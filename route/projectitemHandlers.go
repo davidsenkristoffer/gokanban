@@ -1,17 +1,24 @@
 package route
 
 import (
+	"fmt"
 	"gokanban/components"
 	"gokanban/db/dbprojectitem"
 	"gokanban/structs/projectitem"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
 
 func getProjectItem(c echo.Context) error {
+	projectitemid, err := strconv.ParseInt(c.Param("projectitemid"), 10, 64)
+	if err != nil {
+		return err
+	}
+
 	db := c.(*kanbanContext).db
-	p, err := dbprojectitem.GetProjectItem(db, c.Param("projectitemid"))
+	p, err := dbprojectitem.GetProjectItem(db, projectitemid)
 	if err != nil {
 		return err
 	}
@@ -47,13 +54,58 @@ func createProjectItem(c echo.Context) error {
 	return c.Redirect(303, "/projectitem/"+strconv.FormatInt(id, 10))
 }
 
-func deleteProjectItem(c echo.Context) error {
-	db := c.(*kanbanContext).db
+func updateProjectItem(c echo.Context) error {
 	projectitemid, err := strconv.ParseInt(c.Param("projectitemid"), 10, 64)
 	if err != nil {
 		return err
 	}
 
+	db := c.(*kanbanContext).db
+	toUpdate, err := dbprojectitem.GetProjectItem(db, projectitemid)
+	if err != nil {
+		return c.NoContent(404)
+	}
+
+	estimatedTime, err := strconv.ParseFloat(c.FormValue("estimatedtime"), 64)
+	if err != nil {
+		estimatedTime = toUpdate.EstimatedTime
+	}
+
+	spentTime, err := strconv.ParseFloat(c.FormValue("spenttime"), 64)
+	if err != nil {
+		spentTime = toUpdate.SpentTime
+	}
+
+	columnId, err := strconv.ParseInt(c.FormValue("columnid"), 10, 64)
+	if err != nil {
+		columnId = toUpdate.ColumnId
+	}
+
+	clone := &projectitem.ProjectItem{
+		ID:            projectitemid,
+		Title:         c.FormValue("title"),
+		Description:   c.FormValue("description"),
+		EstimatedTime: estimatedTime,
+		SpentTime:     spentTime,
+		Updated:       time.Now(),
+		ColumnId:      columnId,
+	}
+
+	_, err = dbprojectitem.UpdateProjectItem(db, *clone)
+	if err != nil {
+		return c.NoContent(500)
+	}
+
+	return c.Redirect(303, fmt.Sprintf("/projectitem/%d", projectitemid))
+}
+
+func deleteProjectItem(c echo.Context) error {
+	projectitemid, err := strconv.ParseInt(c.Param("projectitemid"), 10, 64)
+	if err != nil {
+		return err
+	}
+
+	db := c.(*kanbanContext).db
 	_, err = dbprojectitem.DeleteProjectItem(db, int(projectitemid))
 	if err != nil {
 		return c.NoContent(500)
@@ -68,6 +120,21 @@ func createProjectItemForm(c echo.Context) error {
 		return c.JSON(400, "Bad request")
 	}
 	cmp := components.CreateProjectItem(id)
+	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
+	return View(c, cmp)
+}
+
+func updateProjectItemForm(c echo.Context) error {
+	projectitemid, err := strconv.ParseInt(c.Param("projectitemid"), 10, 64)
+	if err != nil {
+		return c.NoContent(400)
+	}
+	p, err := dbprojectitem.GetProjectItem(c.(*kanbanContext).db, projectitemid)
+	if err != nil {
+		return c.NoContent(404)
+	}
+
+	cmp := components.EditProjectItem(*p.ToViewModel())
 	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
 	return View(c, cmp)
 }

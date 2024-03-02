@@ -6,7 +6,7 @@ import (
 )
 
 type ProjectItem struct {
-	ID            int     `json:"id"`
+	ID            int64   `json:"id"`
 	Title         string  `json:"title"`
 	Description   string  `json:"description"`
 	EstimatedTime float64 `json:"estimatedtime"`
@@ -29,7 +29,7 @@ type ProjectItemViewModel struct {
 
 func (p ProjectItem) ToViewModel() *ProjectItemViewModel {
 	return &ProjectItemViewModel{
-		Id:            s.Itoa(p.ID),
+		Id:            s.FormatInt(p.ID, 10),
 		Title:         p.Title,
 		Description:   p.Description,
 		EstimatedTime: s.FormatFloat(p.EstimatedTime, 'f', 0, 64),

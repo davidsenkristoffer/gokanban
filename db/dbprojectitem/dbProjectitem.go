@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func GetProjectItem(db *sql.DB, id string) (*projectitem.ProjectItem, error) {
+func GetProjectItem(db *sql.DB, id int64) (*projectitem.ProjectItem, error) {
 	row := db.QueryRow("select * from projectitem where id = ?", id)
 	p := &projectitem.ProjectItem{}
 	err := row.Scan(&p.ID, &p.Title, &p.Description, &p.EstimatedTime, &p.SpentTime, &p.Created, &p.Updated, &p.ColumnId)
