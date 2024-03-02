@@ -7,7 +7,7 @@ import (
 	"gokanban/db/dbproject"
 	"gokanban/structs/board"
 	"gokanban/structs/project"
-	"strconv"
+	s "strconv"
 	"time"
 
 	"github.com/a-h/templ"
@@ -30,7 +30,7 @@ func index(c echo.Context) error {
 
 func getProject(c echo.Context) error {
 	id := c.Param("id")
-	if _, err := strconv.ParseInt(id, 10, 64); err != nil {
+	if _, err := s.ParseInt(id, 10, 64); err != nil {
 		c.Logger().Errorf("Param \"id\" was not formatted correctly. Received value: %s", id)
 		return c.JSON(400, "Bad request")
 	}
@@ -87,9 +87,10 @@ func createProject(c echo.Context) error {
 		}
 	}
 
-	return c.Redirect(303, "/project/"+strconv.FormatInt(projectid, 10)+"/card")
+	return c.Redirect(303, "/project/"+s.FormatInt(projectid, 10)+"/card")
 }
 
 func View(c echo.Context, cmp templ.Component) error {
+	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
 	return cmp.Render(c.Request().Context(), c.Response().Writer)
 }

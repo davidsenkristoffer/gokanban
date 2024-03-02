@@ -5,7 +5,7 @@ import (
 	"gokanban/structs/board"
 )
 
-func GetBoard(db *sql.DB, id int) (*board.Board, error) {
+func GetBoard(db *sql.DB, id int64) (*board.Board, error) {
 	stmt := db.QueryRow("select id, title, created from board where id = ?", id)
 	board := &board.Board{}
 	err := stmt.Scan(&board.ID, &board.Title, &board.Created)

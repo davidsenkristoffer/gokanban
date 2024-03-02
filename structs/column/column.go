@@ -22,7 +22,7 @@ type ColumnViewModel struct {
 	ColumnType   int
 	ColumnOrder  int
 	Created      string
-	BoardId      int
+	BoardId      string
 	ProjectItems []projectitem.ProjectItemViewModel
 }
 
@@ -37,7 +37,7 @@ func (c Column) ToViewModel() *ColumnViewModel {
 		ColumnType:   c.ColumnType,
 		ColumnOrder:  c.ColumnOrder,
 		Created:      c.Created.In(t.Local).Format("yyyy-MM-dd"),
-		BoardId:      int(c.BoardId),
+		BoardId:      s.Itoa(int(c.BoardId)),
 		ProjectItems: projectitems,
 	}
 }

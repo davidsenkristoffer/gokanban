@@ -18,8 +18,8 @@ templ Kanban(p project.ProjectViewModel) {
             <main>
                 <h1>{ p.Title }</h1>
                 <div class="boards">
-                    for i, b := range p.Boards {
-                        @Board(b, i)            
+                    for _, b := range p.Boards {
+                        @Board(b)            
                     }
                 </div>
             </main>    
@@ -31,15 +31,15 @@ templ Boards(p project.ProjectViewModel) {
     <main>
         <h1>{ p.Title }</h1>
         <div class="boards">
-            for i, b := range p.Boards {
-                @Board(b, i)            
+            for _, b := range p.Boards {
+                @Board(b)            
             }
         </div>
     </main>    
 }
 
-templ Board(b board.BoardViewModel, i int) {
-    <details open class="board">
+templ Board(b board.BoardViewModel) {
+    <details open class="board" id={"board-"+b.Id}>
         <summary class="board_summary">
             { b.Title }
         </summary>
@@ -65,15 +65,15 @@ templ Column(col column.ColumnViewModel, i int) {
 templ ProjectItems(col column.ColumnViewModel, i int) {
     <ol class="projectitems_list">
         for _, p := range col.ProjectItems {
-            @ProjectItem(p, false)
+            @ProjectItem(p, col.BoardId, false)
         }
     if i == 0 {
-        @Plus(fmt.Sprintf("/projectitem/%s/new", col.Id), "outerHTML")
+        @Plus(fmt.Sprintf("/board/%d/projectitem/%s/new", col.BoardId, col.Id), "outerHTML")
     }
     </ol>
 }
 
-templ ProjectItem(p projectitem.ProjectItemViewModel, isHXRequest bool) {
+templ ProjectItem(p projectitem.ProjectItemViewModel, boardid string, isHXRequest bool) {
     <div class="projectitem" id={ "projectitem-" + p.Id }>
         <h3>{ p.Title }</h3>
         if len(p.Description) > 0 {
@@ -82,7 +82,7 @@ templ ProjectItem(p projectitem.ProjectItemViewModel, isHXRequest bool) {
         <p>Time estimated: { p.EstimatedTime }</p>
         <p>Time spent: { p.SpentTime }</p>
         <div class="projectitem_toolbar">
-            @EditIcon(fmt.Sprintf("/projectitem/%s/edit", p.Id), "outerHTML", fmt.Sprintf("#projectitem-%s", p.Id))
+            @EditIcon(fmt.Sprintf("/board/%s/projectitem/%s/edit", boardid, p.Id), "outerHTML", fmt.Sprintf("#projectitem-%s", p.Id))
             @DeleteIcon(fmt.Sprintf("/projectitem/%s", p.Id), "delete", fmt.Sprintf("#projectitem-%s", p.Id))
         </div>
     </div>
@@ -91,8 +91,8 @@ templ ProjectItem(p projectitem.ProjectItemViewModel, isHXRequest bool) {
     }
 }
 
-templ CreateProjectItem(id string) {
-    <form class="projectitem" hx-post={fmt.Sprintf("/projectitem/%s/new", id)} hx-swap="outerHTML">
+templ CreateProjectItem(id string, boardid string) {
+    <form class="projectitem" hx-post={fmt.Sprintf("/board/%s/projectitem/%s/new", boardid, id)} hx-swap="outerHTML">
         Tittel: <input type="text" name="title" />
         Beskrivelse: <textarea name="description" cols="10" rows="5"></textarea>
         Estimert tidsbruk: <input type="number" name="estimatedtime" />
@@ -100,8 +100,11 @@ templ CreateProjectItem(id string) {
     </form>
 }
 
-templ EditProjectItem(p projectitem.ProjectItemViewModel) {
-    <form class="projectitem" hx-put={fmt.Sprintf("/projectitem/%s/edit", p.Id)} hx-swap="outerHTML">
+templ EditProjectItem(p projectitem.ProjectItemViewModel, boardid string) {
+    <form class="projectitem" 
+        hx-put={fmt.Sprintf("/board/%s/projectitem/%s/edit", boardid, p.Id)} 
+        hx-swap="outerHTML"
+        hx-target={"#board-"+boardid}>
         Tittel: <input type="text" name="title" value={p.Title} />
         Beskrivelse: <textarea name="description" cols="10" rows="5" value={p.Description}></textarea>
         Estimert tidsbruk: <input type="number" name="estimatedtime" value={p.EstimatedTime} />
@@ -109,6 +112,8 @@ templ EditProjectItem(p projectitem.ProjectItemViewModel) {
         Status: <select>
             
         </select>
+        <input type="hidden" name="boardid" value={boardid} />
+        <button type="submit">Oppdater</button>
     </form>
 }
 

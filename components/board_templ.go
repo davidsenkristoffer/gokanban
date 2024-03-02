@@ -48,8 +48,8 @@ func Kanban(p project.ProjectViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for i, b := range p.Boards {
-			templ_7745c5c3_Err = Board(b, i).Render(ctx, templ_7745c5c3_Buffer)
+		for _, b := range p.Boards {
+			templ_7745c5c3_Err = Board(b).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -95,8 +95,8 @@ func Boards(p project.ProjectViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for i, b := range p.Boards {
-			templ_7745c5c3_Err = Board(b, i).Render(ctx, templ_7745c5c3_Buffer)
+		for _, b := range p.Boards {
+			templ_7745c5c3_Err = Board(b).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -112,7 +112,7 @@ func Boards(p project.ProjectViewModel) templ.Component {
 	})
 }
 
-func Board(b board.BoardViewModel, i int) templ.Component {
+func Board(b board.BoardViewModel) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -125,7 +125,15 @@ func Board(b board.BoardViewModel, i int) templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<details open class=\"board\"><summary class=\"board_summary\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<details open class=\"board\" id=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString("board-" + b.Id))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><summary class=\"board_summary\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -243,13 +251,13 @@ func ProjectItems(col column.ColumnViewModel, i int) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, p := range col.ProjectItems {
-			templ_7745c5c3_Err = ProjectItem(p, false).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = ProjectItem(p, col.BoardId, false).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if i == 0 {
-			templ_7745c5c3_Err = Plus(fmt.Sprintf("/projectitem/%s/new", col.Id), "outerHTML").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = Plus(fmt.Sprintf("/board/%d/projectitem/%s/new", col.BoardId, col.Id), "outerHTML").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -265,7 +273,7 @@ func ProjectItems(col column.ColumnViewModel, i int) templ.Component {
 	})
 }
 
-func ProjectItem(p projectitem.ProjectItemViewModel, isHXRequest bool) templ.Component {
+func ProjectItem(p projectitem.ProjectItemViewModel, boardid string, isHXRequest bool) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -352,7 +360,7 @@ func ProjectItem(p projectitem.ProjectItemViewModel, isHXRequest bool) templ.Com
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = EditIcon(fmt.Sprintf("/projectitem/%s/edit", p.Id), "outerHTML", fmt.Sprintf("#projectitem-%s", p.Id)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = EditIcon(fmt.Sprintf("/board/%s/projectitem/%s/edit", boardid, p.Id), "outerHTML", fmt.Sprintf("#projectitem-%s", p.Id)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -377,7 +385,7 @@ func ProjectItem(p projectitem.ProjectItemViewModel, isHXRequest bool) templ.Com
 	})
 }
 
-func CreateProjectItem(id string) templ.Component {
+func CreateProjectItem(id string, boardid string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -394,7 +402,7 @@ func CreateProjectItem(id string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("/projectitem/%s/new", id)))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("/board/%s/projectitem/%s/new", boardid, id)))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -409,7 +417,7 @@ func CreateProjectItem(id string) templ.Component {
 	})
 }
 
-func EditProjectItem(p projectitem.ProjectItemViewModel) templ.Component {
+func EditProjectItem(p projectitem.ProjectItemViewModel, boardid string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -426,11 +434,19 @@ func EditProjectItem(p projectitem.ProjectItemViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("/projectitem/%s/edit", p.Id)))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(fmt.Sprintf("/board/%s/projectitem/%s/edit", boardid, p.Id)))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"outerHTML\">Tittel: <input type=\"text\" name=\"title\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-swap=\"outerHTML\" hx-target=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString("#board-" + boardid))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">Tittel: <input type=\"text\" name=\"title\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -462,7 +478,15 @@ func EditProjectItem(p projectitem.ProjectItemViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> Status: <select></select></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> Status: <select></select> <input type=\"hidden\" name=\"boardid\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(boardid))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <button type=\"submit\">Oppdater</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

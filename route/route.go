@@ -29,14 +29,19 @@ func Init(database *sql.DB) *echo.Echo {
 		project.POST("/:id/board", createProjectBoard)
 	}
 
+	board := e.Group("/board")
+	{
+		board.GET("/:boardid", getProjectBoard)
+		board.GET("/:boardid/projectitem/:projectitemid/edit", updateProjectItemForm)
+		board.PUT("/:boardid/projectitem/:projectitemid/edit", updateProjectItem)
+	}
+
 	projectitem := e.Group("/projectitem")
 	{
 		projectitem.GET("/:columnid/new", createProjectItemForm)
 		projectitem.POST("/:columnid/new", createProjectItem)
 		projectitem.GET("/:projectitemid", getProjectItem)
 		projectitem.DELETE("/:projectitemid", deleteProjectItem)
-		projectitem.PUT("/:projectitemid/edit", updateProjectItem)
-		projectitem.GET("/:projectitemid/edit", updateProjectItemForm)
 	}
 
 	return e

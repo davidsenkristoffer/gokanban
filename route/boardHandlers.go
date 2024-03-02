@@ -6,11 +6,12 @@ import (
 	"gokanban/db/dbboard"
 	"gokanban/db/dbcolumn"
 	"gokanban/db/dbproject"
-	"gokanban/db/dbprojectitem"
+	"gokanban/helpers"
 	"gokanban/structs/board"
 	"gokanban/structs/column"
 	"slices"
 	"strconv"
+	s "strconv"
 	"time"
 
 	"github.com/a-h/templ"
@@ -35,21 +36,14 @@ func getProjectBoards(c echo.Context) error {
 	}
 
 	for i, b := range boards {
-		columns, err := dbcolumn.GetColumns(db, strconv.Itoa(b.ID))
+		columns, err := helpers.GetColumns(db, c, b)
 		if err != nil {
 			c.Logger().Errorf("Error while selecting columns for board %d: %s", b.ID, err)
+			continue
+		} else {
+			slices.SortFunc(columns, compareColumnOrder)
+			boards[i].Columns = append(boards[i].Columns, columns...)
 		}
-
-		for j, col := range columns {
-			items, err := dbprojectitem.GetProjectItems(db, col.ID)
-			if err != nil {
-				c.Logger().Errorf("Error while selecting projectitems for column &d: &s", col.ID, err)
-			}
-			columns[j].Items = append(columns[j].Items, items...)
-		}
-
-		slices.SortFunc(columns, compareColumnOrder)
-		boards[i].Columns = append(boards[i].Columns, columns...)
 	}
 	project.Boards = boards
 
@@ -62,6 +56,29 @@ func getProjectBoards(c echo.Context) error {
 	} else {
 		cmp = components.Kanban(*pvm)
 	}
+	return View(c, cmp)
+}
+
+func getProjectBoard(c echo.Context) error {
+	boardid, err := s.ParseInt(c.Param("boardid"), 10, 64)
+	if err != nil {
+		return c.NoContent(400)
+	}
+	db := c.(*kanbanContext).db
+	board, err := dbboard.GetBoard(db, boardid)
+	if err != nil {
+		return c.NoContent(404)
+	}
+
+	columns, err := helpers.GetColumns(db, c, *board)
+	if err != nil {
+		return c.NoContent(404)
+	}
+
+	slices.SortFunc(columns, compareColumnOrder)
+	board.Columns = append(board.Columns, columns...)
+
+	cmp := components.Board(*board.ToViewModel())
 	return View(c, cmp)
 }
 

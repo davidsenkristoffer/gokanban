@@ -12,6 +12,10 @@ import (
 )
 
 func getProjectItem(c echo.Context) error {
+	boardid := c.Param("boardid")
+	if _, err := strconv.ParseInt(boardid, 10, 64); err != nil {
+		return c.NoContent(400)
+	}
 	projectitemid, err := strconv.ParseInt(c.Param("projectitemid"), 10, 64)
 	if err != nil {
 		return err
@@ -24,7 +28,7 @@ func getProjectItem(c echo.Context) error {
 	}
 
 	hxReq := c.Request().Header.Get("HX-Request")
-	cmp := components.ProjectItem(*p.ToViewModel(), len(hxReq) > 0)
+	cmp := components.ProjectItem(*p.ToViewModel(), boardid, len(hxReq) > 0)
 
 	return View(c, cmp)
 }
@@ -55,6 +59,10 @@ func createProjectItem(c echo.Context) error {
 }
 
 func updateProjectItem(c echo.Context) error {
+	boardid := c.Param("boardid")
+	if _, err := strconv.ParseInt(boardid, 10, 64); err != nil {
+		return c.NoContent(400)
+	}
 	projectitemid, err := strconv.ParseInt(c.Param("projectitemid"), 10, 64)
 	if err != nil {
 		return err
@@ -96,7 +104,7 @@ func updateProjectItem(c echo.Context) error {
 		return c.NoContent(500)
 	}
 
-	return c.Redirect(303, fmt.Sprintf("/projectitem/%d", projectitemid))
+	return c.Redirect(303, fmt.Sprintf("/board/%s", boardid))
 }
 
 func deleteProjectItem(c echo.Context) error {
@@ -115,16 +123,23 @@ func deleteProjectItem(c echo.Context) error {
 }
 
 func createProjectItemForm(c echo.Context) error {
+	boardid := c.Param("boardid")
+	if _, err := strconv.ParseInt(boardid, 10, 64); err != nil {
+		return c.NoContent(400)
+	}
 	id := c.Param("columnid")
 	if _, err := strconv.ParseInt(id, 10, 64); err != nil {
 		return c.JSON(400, "Bad request")
 	}
-	cmp := components.CreateProjectItem(id)
-	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
+	cmp := components.CreateProjectItem(id, boardid)
 	return View(c, cmp)
 }
 
 func updateProjectItemForm(c echo.Context) error {
+	boardid := c.Param("boardid")
+	if _, err := strconv.ParseInt(boardid, 10, 64); err != nil {
+		return c.NoContent(400)
+	}
 	projectitemid, err := strconv.ParseInt(c.Param("projectitemid"), 10, 64)
 	if err != nil {
 		return c.NoContent(400)
@@ -134,7 +149,6 @@ func updateProjectItemForm(c echo.Context) error {
 		return c.NoContent(404)
 	}
 
-	cmp := components.EditProjectItem(*p.ToViewModel())
-	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
+	cmp := components.EditProjectItem(*p.ToViewModel(), boardid)
 	return View(c, cmp)
 }
