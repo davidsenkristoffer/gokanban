@@ -15,7 +15,7 @@ templ Projectcards(items []project.ProjectViewModel) {
 
 templ Projectcard(p project.ProjectViewModel) {
     <li>
-        <a href={ templ.SafeURL(fmt.Sprintf("/project/%s/board", p.Id)) }>
+        <a href={ templ.URL(fmt.Sprintf("/project/%s/board", p.Id)) }>
             <div class="card">
                 <h2>{ p.Title }</h2>
                 <p>{ p.Description }</p>

@@ -40,6 +40,13 @@ func Init(database *sql.DB) *echo.Echo {
 		board.DELETE("/:boardid/projectitem/:projectitemid", deleteProjectItem)
 	}
 
+	validate := e.Group("/validate")
+	{
+		validate.GET("/title", validateTitle)
+		validate.GET("/description", validateDescription)
+		validate.GET("/estimatedtime", validateEstimatedtime)
+	}
+
 	return e
 }
 

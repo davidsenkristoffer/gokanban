@@ -57,6 +57,12 @@ ul, ol {
     flex-direction: row-reverse;
 }
 
+.errors {
+    list-style-type: initial;
+    padding-left: 1em;
+    color: red;
+}
+
 details {
     background-color: rgb(159 209 255 / 60%);
     border-top: 0.125em solid black;

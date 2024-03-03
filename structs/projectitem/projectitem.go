@@ -34,8 +34,46 @@ func (p ProjectItem) ToViewModel() *ProjectItemViewModel {
 		Description:   p.Description,
 		EstimatedTime: s.FormatFloat(p.EstimatedTime, 'f', 0, 64),
 		SpentTime:     s.FormatFloat(p.SpentTime, 'f', 0, 64),
-		Created:       p.Created.In(t.Local).Format("dd.MM.yyyy"),
-		Updated:       p.Updated.In(t.Local).Format("dd.MM.yyyy"),
+		Created:       p.Created.Format(t.DateOnly),
+		Updated:       p.Updated.String(),
 		ColumnId:      s.FormatInt(p.ColumnId, 10),
 	}
+}
+
+func (pvm ProjectItemViewModel) ToModel() (*ProjectItem, error) {
+	id, err := s.ParseInt(pvm.Id, 10, 64)
+	if len(pvm.Id) > 0 && err != nil {
+		return nil, err
+	}
+	estimatedtime, err := s.ParseFloat(pvm.EstimatedTime, 64)
+	if len(pvm.EstimatedTime) > 0 && err != nil {
+		return nil, err
+	}
+	spenttime, err := s.ParseFloat(pvm.SpentTime, 64)
+	if len(pvm.SpentTime) > 0 && err != nil {
+		return nil, err
+	}
+	columnid, err := s.ParseInt(pvm.ColumnId, 10, 64)
+	if len(pvm.ColumnId) > 0 && err != nil {
+		return nil, err
+	}
+	created, err := t.Parse(t.DateOnly, pvm.Created)
+	if len(pvm.Created) > 0 && err != nil {
+		return nil, err
+	}
+	updated, err := t.Parse(t.DateOnly, pvm.Updated)
+	if len(pvm.Updated) > 0 && err != nil {
+		return nil, err
+	}
+
+	return &ProjectItem{
+		ID:            id,
+		Title:         pvm.Title,
+		Description:   pvm.Description,
+		EstimatedTime: estimatedtime,
+		SpentTime:     spenttime,
+		Created:       created,
+		Updated:       updated,
+		ColumnId:      columnid,
+	}, nil
 }

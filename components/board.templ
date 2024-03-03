@@ -89,11 +89,34 @@ templ ProjectItem(p projectitem.ProjectItemViewModel, boardid string) {
     </div>
 }
 
-templ CreateProjectItem(columnid string, boardid string) {
-    <form class="projectitem" hx-post={fmt.Sprintf("/board/%s/projectitem/%s/new", boardid, columnid)} hx-swap="outerHTML">
-        Tittel: <input type="text" name="title" />
-        Beskrivelse: <textarea name="description" cols="10" rows="5"></textarea>
-        Estimert tidsbruk: <input type="number" name="estimatedtime" />
+templ CreateProjectItem(p projectitem.ProjectItemViewModel, boardid string, validations map[string][]string) {
+    <form class="projectitem" hx-post={fmt.Sprintf("/board/%s/projectitem/%s/new", boardid, p.ColumnId)} hx-swap="outerHTML">
+        Tittel: <input type="text" name="title" value={p.Title}
+                    hx-get="/validate/title" 
+                    hx-target="next .errors"
+                    hx-swap="innerHTML"
+                    hx-trigger="change, keyup delay:300ms changed" />
+        <ul class="errors">
+            @DisplayErrors(validations["title"])
+        </ul>
+        Beskrivelse: <textarea name="description" cols="10" rows="5"
+                    hx-get="/validate/description"
+                    hx-target="next .errors"
+                    hx-swap="innerHTML"
+                    hx-trigger="change, keyup delay:300ms changed">
+                        {p.Description}
+                    </textarea>
+        <ul class="errors">
+            @DisplayErrors(validations["description"])
+        </ul>
+        Estimert tidsbruk: <input type="number" name="estimatedtime" value={p.EstimatedTime}
+                    hx-get="/validate/estimatedtime"
+                    hx-target="next .errors"
+                    hx-swap="innerHTML"
+                    hx-trigger="change, keyup delay:300ms changed" />
+        <ul class="errors">
+            @DisplayErrors(validations["estimatedtime"])
+        </ul>
         <button type="submit">Opprett</button>
     </form>
 }

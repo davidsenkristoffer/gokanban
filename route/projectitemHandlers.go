@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gokanban/components"
 	"gokanban/db/dbprojectitem"
+	"gokanban/helpers"
 	"gokanban/structs/projectitem"
 	"strconv"
 	"time"
@@ -36,23 +37,33 @@ func createProjectItem(c echo.Context) error {
 	if _, err := strconv.ParseInt(boardid, 10, 64); err != nil {
 		return c.NoContent(400)
 	}
-	columnid, err := strconv.ParseInt(c.Param("columnid"), 10, 64)
-	if err != nil {
-		return err
+	columnid := c.Param("columnid")
+	if _, err := strconv.ParseInt(columnid, 10, 64); err != nil {
+		return c.NoContent(400)
 	}
-	estimatedTime, err := strconv.ParseFloat(c.FormValue("estimatedtime"), 64)
-	if err != nil {
-		estimatedTime = 0
-	}
-	db := c.(*kanbanContext).db
 
-	id, err := dbprojectitem.CreateProjectItem(db, projectitem.ProjectItem{
+	pvm := &projectitem.ProjectItemViewModel{
 		Title:         c.FormValue("title"),
 		Description:   c.FormValue("description"),
-		EstimatedTime: estimatedTime,
-		SpentTime:     0,
+		EstimatedTime: c.FormValue("estimatedtime"),
 		ColumnId:      columnid,
-	})
+	}
+
+	validation, containsErrors := helpers.ValidateProjectItem(*pvm)
+	if containsErrors {
+		cmp := components.CreateProjectItem(*pvm, boardid, validation)
+		return View(c, cmp)
+	}
+
+	p, err := pvm.ToModel()
+	if err != nil {
+		c.Logger().Errorf("Error while creating projectitem from view model: %s", err)
+		return c.NoContent(500)
+	}
+
+	db := c.(*kanbanContext).db
+
+	id, err := dbprojectitem.CreateProjectItem(db, *p)
 	if err != nil {
 		return err
 	}
@@ -133,7 +144,15 @@ func createProjectItemForm(c echo.Context) error {
 	if _, err := strconv.ParseInt(columnid, 10, 64); err != nil {
 		return c.JSON(400, "Bad request")
 	}
-	cmp := components.CreateProjectItem(columnid, boardid)
+	p := &projectitem.ProjectItemViewModel{
+		Title:         "",
+		Description:   "",
+		EstimatedTime: "",
+		SpentTime:     "",
+		ColumnId:      columnid,
+	}
+
+	cmp := components.CreateProjectItem(*p, boardid, make(map[string][]string))
 	return View(c, cmp)
 }
 

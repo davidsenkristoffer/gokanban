@@ -31,7 +31,7 @@ func (p Project) ToViewModel() *ProjectViewModel {
 		Id:          strconv.Itoa(p.ID),
 		Title:       p.Title,
 		Description: p.Description,
-		Created:     p.Created.In(t.Local).Format("dd.MM.yyyy"),
+		Created:     p.Created.Format(t.DateOnly),
 		Boards:      boards,
 	}
 }
