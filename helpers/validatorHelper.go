@@ -12,7 +12,7 @@ func ValidateProjectItem(p projectitem.ProjectItemViewModel) (map[string][]strin
 	validations := map[string][]string{
 		"title":         ValidateTitle(p.Title),
 		"description":   ValidateDescription(p.Description),
-		"estimatedtime": ValidateEstimatedtime(p.EstimatedTime),
+		"estimatedtime": ValidateTime(p.EstimatedTime),
 	}
 	for _, v := range validations {
 		if len(v) > 0 {
@@ -48,7 +48,7 @@ func ValidateDescription(description string) []string {
 	return errors
 }
 
-func ValidateEstimatedtime(estimatedtime string) []string {
+func ValidateTime(estimatedtime string) []string {
 	errors := []string{}
 	parsedInt, err := strc.ParseInt(estimatedtime, 10, 64)
 	if err != nil {

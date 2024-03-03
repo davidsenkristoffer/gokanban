@@ -3,9 +3,11 @@ package route
 import (
 	"fmt"
 	"gokanban/components"
+	"gokanban/db/dbcolumn"
 	"gokanban/db/dbprojectitem"
 	"gokanban/helpers"
 	"gokanban/structs/projectitem"
+	"gokanban/structs/selectitem"
 	"strconv"
 	"time"
 
@@ -82,34 +84,59 @@ func updateProjectItem(c echo.Context) error {
 	}
 
 	db := c.(*kanbanContext).db
+	pvm := &projectitem.ProjectItemViewModel{
+		Title:         c.FormValue("title"),
+		Description:   c.FormValue("description"),
+		EstimatedTime: c.FormValue("estimatedtime"),
+		SpentTime:     c.FormValue("spenttime"),
+		ColumnId:      c.FormValue("columnid"),
+	}
+
+	validation, containsErrors := helpers.ValidateProjectItem(*pvm)
+	if containsErrors {
+		columns, err := dbcolumn.GetColumns(db, boardid)
+		if err != nil {
+			c.Logger().Errorf("Error while retrieving columns")
+		}
+
+		csi := []selectitem.Selectitem{}
+		for _, c := range columns {
+			csi = append(csi, *c.ToSelectOption())
+		}
+
+		cmp := components.EditProjectItem(*pvm, boardid, validation, csi)
+		return View(c, cmp)
+	}
+
+	columnid, err := strconv.ParseInt(pvm.ColumnId, 10, 64)
+	if err != nil {
+		return c.NoContent(400)
+	}
+
 	toUpdate, err := dbprojectitem.GetProjectItem(db, projectitemid)
 	if err != nil {
 		return c.NoContent(404)
 	}
 
-	estimatedTime, err := strconv.ParseFloat(c.FormValue("estimatedtime"), 64)
+	estimatedTime, err := strconv.ParseFloat(pvm.EstimatedTime, 64)
 	if err != nil {
 		estimatedTime = toUpdate.EstimatedTime
 	}
 
-	spentTime, err := strconv.ParseFloat(c.FormValue("spenttime"), 64)
+	spentTime, err := strconv.ParseFloat(pvm.SpentTime, 64)
 	if err != nil {
 		spentTime = toUpdate.SpentTime
 	}
 
-	columnId, err := strconv.ParseInt(c.FormValue("columnid"), 10, 64)
-	if err != nil {
-		columnId = toUpdate.ColumnId
-	}
-
 	clone := &projectitem.ProjectItem{
 		ID:            projectitemid,
-		Title:         c.FormValue("title"),
-		Description:   c.FormValue("description"),
+		Title:         pvm.Title,
+		Description:   pvm.Description,
 		EstimatedTime: estimatedTime,
 		SpentTime:     spentTime,
+		Created:       toUpdate.Created,
 		Updated:       time.Now(),
-		ColumnId:      columnId,
+		ColumnId:      columnid,
 	}
 
 	_, err = dbprojectitem.UpdateProjectItem(db, *clone)
@@ -165,11 +192,22 @@ func updateProjectItemForm(c echo.Context) error {
 	if err != nil {
 		return c.NoContent(400)
 	}
-	p, err := dbprojectitem.GetProjectItem(c.(*kanbanContext).db, projectitemid)
+	db := c.(*kanbanContext).db
+	p, err := dbprojectitem.GetProjectItem(db, projectitemid)
 	if err != nil {
 		return c.NoContent(404)
 	}
 
-	cmp := components.EditProjectItem(*p.ToViewModel(), boardid)
+	columns, err := dbcolumn.GetColumns(db, boardid)
+	if err != nil {
+		c.Logger().Errorf("Error while retrieving columns")
+	}
+
+	csi := []selectitem.Selectitem{}
+	for _, c := range columns {
+		csi = append(csi, *c.ToSelectOption())
+	}
+
+	cmp := components.EditProjectItem(*p.ToViewModel(), boardid, make(map[string][]string), csi)
 	return View(c, cmp)
 }

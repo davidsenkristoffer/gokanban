@@ -26,7 +26,15 @@ func validateDescription(c echo.Context) error {
 
 func validateEstimatedtime(c echo.Context) error {
 	estimatedtime := c.QueryParam("estimatedtime")
-	errors := helpers.ValidateEstimatedtime(estimatedtime)
+	errors := helpers.ValidateTime(estimatedtime)
+
+	cmp := components.DisplayErrors(errors)
+	return View(c, cmp)
+}
+
+func validateSpenttime(c echo.Context) error {
+	estimatedtime := c.QueryParam("spenttime")
+	errors := helpers.ValidateTime(estimatedtime)
 
 	cmp := components.DisplayErrors(errors)
 	return View(c, cmp)

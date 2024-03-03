@@ -45,6 +45,7 @@ func Init(database *sql.DB) *echo.Echo {
 		validate.GET("/title", validateTitle)
 		validate.GET("/description", validateDescription)
 		validate.GET("/estimatedtime", validateEstimatedtime)
+		validate.GET("/spenttime", validateSpenttime)
 	}
 
 	return e

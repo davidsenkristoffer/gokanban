@@ -2,6 +2,7 @@ package column
 
 import (
 	"gokanban/structs/projectitem"
+	"gokanban/structs/selectitem"
 	s "strconv"
 	t "time"
 )
@@ -39,5 +40,12 @@ func (c Column) ToViewModel() *ColumnViewModel {
 		Created:      c.Created.In(t.Local).Format("yyyy-MM-dd"),
 		BoardId:      s.Itoa(int(c.BoardId)),
 		ProjectItems: projectitems,
+	}
+}
+
+func (c Column) ToSelectOption() *selectitem.Selectitem {
+	return &selectitem.Selectitem{
+		Label: c.Title,
+		Value: s.Itoa(int(c.ID)),
 	}
 }

@@ -35,7 +35,7 @@ func (p ProjectItem) ToViewModel() *ProjectItemViewModel {
 		EstimatedTime: s.FormatFloat(p.EstimatedTime, 'f', 0, 64),
 		SpentTime:     s.FormatFloat(p.SpentTime, 'f', 0, 64),
 		Created:       p.Created.Format(t.DateOnly),
-		Updated:       p.Updated.String(),
+		Updated:       p.Updated.Format(t.DateOnly),
 		ColumnId:      s.FormatInt(p.ColumnId, 10),
 	}
 }

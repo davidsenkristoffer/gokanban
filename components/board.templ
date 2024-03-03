@@ -6,6 +6,7 @@ import (
     "gokanban/structs/column"
 	"fmt"
 	"gokanban/structs/projectitem"
+	"gokanban/structs/selectitem"
 )
 
 templ Kanban(p project.ProjectViewModel) {
@@ -95,45 +96,68 @@ templ CreateProjectItem(p projectitem.ProjectItemViewModel, boardid string, vali
                     hx-get="/validate/title" 
                     hx-target="next .errors"
                     hx-swap="innerHTML"
-                    hx-trigger="change, keyup delay:300ms changed" />
-        <ul class="errors">
-            @DisplayErrors(validations["title"])
-        </ul>
+                    hx-trigger="keyup delay:300ms changed" />
+        @ErrorList(validations["title"])
         Beskrivelse: <textarea name="description" cols="10" rows="5"
                     hx-get="/validate/description"
                     hx-target="next .errors"
                     hx-swap="innerHTML"
-                    hx-trigger="change, keyup delay:300ms changed">
+                    hx-trigger="keyup delay:300ms changed">
                         {p.Description}
                     </textarea>
-        <ul class="errors">
-            @DisplayErrors(validations["description"])
-        </ul>
+        @ErrorList(validations["description"])
         Estimert tidsbruk: <input type="number" name="estimatedtime" value={p.EstimatedTime}
                     hx-get="/validate/estimatedtime"
                     hx-target="next .errors"
                     hx-swap="innerHTML"
-                    hx-trigger="change, keyup delay:300ms changed" />
-        <ul class="errors">
-            @DisplayErrors(validations["estimatedtime"])
-        </ul>
+                    hx-trigger="keyup delay:300ms changed" />
+        @ErrorList(validations["estimatedtime"])
         <button type="submit">Opprett</button>
     </form>
 }
 
-templ EditProjectItem(p projectitem.ProjectItemViewModel, boardid string) {
-    <form class="projectitem"
-        id={"editprojectitem-"+p.Id} 
+templ EditProjectItem(p projectitem.ProjectItemViewModel, boardid string, validations map[string][]string, options []selectitem.Selectitem) {
+    <form class="projectitem" id={"editprojectitem-"+p.Id} 
         hx-put={fmt.Sprintf("/board/%s/projectitem/%s/edit", boardid, p.Id)} 
         hx-swap="outerHTML"
         hx-target={"#board-"+boardid}>
-        Tittel: <input type="text" name="title" value={p.Title} />
-        Beskrivelse: <textarea name="description" cols="10" rows="5" value={p.Description}></textarea>
-        Estimert tidsbruk: <input type="number" name="estimatedtime" value={p.EstimatedTime} />
-        Tid brukt: <input type="number" name="spenttime" value={p.SpentTime} />
-        Status: <select>
-            
+        Tittel: <input type="text" name="title" value={p.Title}
+                    hx-get="/validate/title"
+                    hx-target="next .errors"
+                    hx-swap="innerHTML"
+                    hx-trigger="keyup delay:300ms changed" />
+        @ErrorList(validations["title"])
+        Beskrivelse: <textarea name="description" cols="10" rows="5"
+                        hx-get="/validate/description"
+                        hx-target="next .errors"
+                        hx-swap="innerHTML"
+                        hx-trigger="keyup delay:300ms changed">
+            {p.Description}
+        </textarea>
+        @ErrorList(validations["description"])
+        Estimert tidsbruk: <input type="number" name="estimatedtime" value={p.EstimatedTime} 
+                        hx-get="/validate/estimatedtime"
+                        hx-target="next .errors"
+                        hx-swap="innerHTML"
+                        hx-trigger="keyup delay:300ms changed"/>
+        @ErrorList(validations["estimatedtime"])
+        Tid brukt: <input type="number" name="spenttime" value={p.SpentTime} 
+                        hx-get="/validate/spenttime"
+                        hx-target="next .errors"
+                        hx-swap="innerHTML"
+                        hx-trigger="keyup delay:300ms changed"/>
+        @ErrorList(validations["spenttime"])
+        Status: 
+        <select name="columnid">
+            for _, v := range options {
+                if v.Value == p.ColumnId {
+                    <option value={v.Value} selected>{v.Label}</option>
+                } else {
+                    <option value={v.Value}>{v.Label}</option>
+                }
+            }
         </select>
+        @ErrorList(validations["columnid"])
         <input type="hidden" name="boardid" value={boardid} />
         <div class="projectitem_editbuttons">
             <button type="submit">Oppdater</button>
@@ -156,4 +180,10 @@ func getColumnStyle(c column.ColumnViewModel) string {
         default:
             return "column column_two"
     }
+}
+
+templ ErrorList(values []string) {
+    <ul class="errors">
+        @DisplayErrors(values)
+    </ul>
 }
