@@ -1,0 +1,8 @@
+<ul class=\"projectcards\">
+</ul>
+<li><a href=\"
+\"><div class=\"card\"><h2>
+</h2><p>
+</p><p>Opprettet: <time>
+</time></p></div></a></li>
+<div><form hx-post=\"/project/new\" hx-target=\"previous ul\" hx-swap=\"beforeend\">Tittel: <input type=\"text\" name=\"title\"> Beskrivelse: <textarea rows=\"5\" cols=\"10\" name=\"description\"></textarea> <button type=\"submit\">Opprett</button></form></div>

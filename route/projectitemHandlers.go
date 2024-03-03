@@ -27,13 +27,15 @@ func getProjectItem(c echo.Context) error {
 		return err
 	}
 
-	hxReq := c.Request().Header.Get("HX-Request")
-	cmp := components.ProjectItem(*p.ToViewModel(), boardid, len(hxReq) > 0)
-
+	cmp := components.ProjectItem(*p.ToViewModel(), boardid)
 	return View(c, cmp)
 }
 
 func createProjectItem(c echo.Context) error {
+	boardid := c.Param("boardid")
+	if _, err := strconv.ParseInt(boardid, 10, 64); err != nil {
+		return c.NoContent(400)
+	}
 	columnid, err := strconv.ParseInt(c.Param("columnid"), 10, 64)
 	if err != nil {
 		return err
@@ -55,7 +57,7 @@ func createProjectItem(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(303, "/projectitem/"+strconv.FormatInt(id, 10))
+	return c.Redirect(303, fmt.Sprintf("/board/%s/projectitem/%s", boardid, strconv.FormatInt(id, 10)))
 }
 
 func updateProjectItem(c echo.Context) error {
@@ -127,11 +129,11 @@ func createProjectItemForm(c echo.Context) error {
 	if _, err := strconv.ParseInt(boardid, 10, 64); err != nil {
 		return c.NoContent(400)
 	}
-	id := c.Param("columnid")
-	if _, err := strconv.ParseInt(id, 10, 64); err != nil {
+	columnid := c.Param("columnid")
+	if _, err := strconv.ParseInt(columnid, 10, 64); err != nil {
 		return c.JSON(400, "Bad request")
 	}
-	cmp := components.CreateProjectItem(id, boardid)
+	cmp := components.CreateProjectItem(columnid, boardid)
 	return View(c, cmp)
 }
 

@@ -52,10 +52,9 @@ ul, ol {
     margin: 0.25em 0;
 }
 
-.sortable {
-    min-height: 2em;
-    width: auto;
-    border: 0.5px dotted black;
+.projectitem_toolbar {
+    display: flex;
+    flex-direction: row-reverse;
 }
 
 details {

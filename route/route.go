@@ -32,16 +32,12 @@ func Init(database *sql.DB) *echo.Echo {
 	board := e.Group("/board")
 	{
 		board.GET("/:boardid", getProjectBoard)
+		board.GET("/:boardid/projectitem/:projectitemid", getProjectItem)
+		board.GET("/:boardid/projectitem/:columnid/new", createProjectItemForm)
+		board.POST("/:boardid/projectitem/:columnid/new", createProjectItem)
 		board.GET("/:boardid/projectitem/:projectitemid/edit", updateProjectItemForm)
 		board.PUT("/:boardid/projectitem/:projectitemid/edit", updateProjectItem)
-	}
-
-	projectitem := e.Group("/projectitem")
-	{
-		projectitem.GET("/:columnid/new", createProjectItemForm)
-		projectitem.POST("/:columnid/new", createProjectItem)
-		projectitem.GET("/:projectitemid", getProjectItem)
-		projectitem.DELETE("/:projectitemid", deleteProjectItem)
+		board.DELETE("/:boardid/projectitem/:projectitemid", deleteProjectItem)
 	}
 
 	return e
