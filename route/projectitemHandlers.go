@@ -30,6 +30,12 @@ func getProjectItem(c echo.Context) error {
 		return err
 	}
 
+	headers := c.Request().Header
+	trigger := headers.Get("HX-Trigger")
+	if len(trigger) > 0 {
+		c.Response().Header().Set("HX-Trigger", trigger)
+	}
+
 	cmp := components.ProjectItem(*p.ToViewModel(), boardid)
 	return View(c, cmp)
 }
@@ -65,12 +71,13 @@ func createProjectItem(c echo.Context) error {
 
 	db := c.(*kanbanContext).db
 
-	id, err := dbprojectitem.CreateProjectItem(db, *p)
+	_, err = dbprojectitem.CreateProjectItem(db, *p)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect(303, fmt.Sprintf("/board/%s/projectitem/%s", boardid, strconv.FormatInt(id, 10)))
+	c.Response().Header().Set("HX-Trigger", fmt.Sprintf("column-updated-%s", columnid))
+	return c.NoContent(201)
 }
 
 func updateProjectItem(c echo.Context) error {
@@ -144,12 +151,15 @@ func updateProjectItem(c echo.Context) error {
 		return c.NoContent(500)
 	}
 
-	c.Response().Header().Set("HX-Trigger", "board-updated")
-
 	return c.Redirect(303, fmt.Sprintf("/board/%s", boardid))
 }
 
 func deleteProjectItem(c echo.Context) error {
+	columnid := c.Param("columnid")
+	if _, err := strconv.ParseInt(columnid, 10, 64); err != nil {
+		return err
+	}
+
 	projectitemid, err := strconv.ParseInt(c.Param("projectitemid"), 10, 64)
 	if err != nil {
 		return err
@@ -161,7 +171,9 @@ func deleteProjectItem(c echo.Context) error {
 		return c.NoContent(500)
 	}
 
-	return c.NoContent(200)
+	c.Response().Header().Set("HX-Trigger", fmt.Sprintf("column-updated-%s", columnid))
+
+	return c.NoContent(204)
 }
 
 func createProjectItemForm(c echo.Context) error {

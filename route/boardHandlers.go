@@ -79,11 +79,6 @@ func getProjectBoard(c echo.Context) error {
 
 	cmp := components.Board(*board.ToViewModel())
 
-	trigger := c.Request().Header.Get("HX-Trigger")
-	if len(trigger) > 0 {
-		c.Response().Header().Set("HX-Trigger", trigger)
-	}
-
 	return View(c, cmp)
 }
 

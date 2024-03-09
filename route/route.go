@@ -37,7 +37,8 @@ func Init(database *sql.DB) *echo.Echo {
 		board.POST("/:boardid/projectitem/:columnid/new", createProjectItem)
 		board.GET("/:boardid/projectitem/:projectitemid/edit", updateProjectItemForm)
 		board.PUT("/:boardid/projectitem/:projectitemid/edit", updateProjectItem)
-		board.DELETE("/:boardid/projectitem/:projectitemid", deleteProjectItem)
+		board.DELETE("/:boardid/columns/:columnid/projectitem/:projectitemid", deleteProjectItem)
+		board.GET("/:boardid/columns/:columnid/items", getColumnItems)
 	}
 
 	validate := e.Group("/validate")

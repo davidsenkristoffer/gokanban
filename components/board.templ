@@ -62,22 +62,30 @@ templ Column(col column.ColumnViewModel, i int) {
     <div class={ getColumnStyle(col) }>
         <h3>{ col.Title }</h3>
         <div class="counter"
-            hx-get={fmt.Sprintf("/column/count/%s", col.Id)} 
-            hx-trigger="board-updated from:body">
+            hx-get={fmt.Sprintf("/column/count/%s", col.Id)}
+            hx-trigger={fmt.Sprintf("column-updated-%s from:body", col.Id)}>
             @Counter(strconv.Itoa(len(col.ProjectItems)))
         </div>
-        @ProjectItems(col, i)
+        <ol class="projectitems_list" 
+            hx-trigger={fmt.Sprintf("column-updated-%s from:body", col.Id)}
+            hx-get={fmt.Sprintf("/board/%s/columns/%s/items", col.BoardId, col.Id)}>
+            @ProjectItems(col, i)
+        </ol>
+        if i == 0 {
+            @Plus(fmt.Sprintf("/board/%s/projectitem/%s/new", col.BoardId, col.Id), "beforeend", "previous ol")
+        }
     </div>
 }
 
 templ ProjectItems(col column.ColumnViewModel, i int) {
-    <ol class="projectitems_list">
-        for _, p := range col.ProjectItems {
-            @ProjectItem(p, col.BoardId)
-        }
-    </ol>
-    if i == 0 {
-        @Plus(fmt.Sprintf("/board/%s/projectitem/%s/new", col.BoardId, col.Id), "beforeend", "previous ol")
+    for _, p := range col.ProjectItems {
+        @ProjectItem(p, col.BoardId)
+    }
+}
+
+templ UpdatedProjectItems(items []projectitem.ProjectItemViewModel, boardid string) {
+    for _, p := range items {
+        @ProjectItem(p, boardid)
     }
 }
 
@@ -90,7 +98,7 @@ templ ProjectItem(p projectitem.ProjectItemViewModel, boardid string) {
         <p>Time estimated: { p.EstimatedTime }</p>
         <p>Time spent: { p.SpentTime }</p>
         <div class="projectitem_toolbar">
-            @DeleteIcon(fmt.Sprintf("/board/%s/projectitem/%s", boardid, p.Id), "delete", fmt.Sprintf("#projectitem-%s", p.Id))
+            @DeleteIcon(fmt.Sprintf("/board/%s/columns/%s/projectitem/%s", boardid, p.ColumnId, p.Id), "delete", fmt.Sprintf("#projectitem-%s", p.Id))
             @EditIcon(fmt.Sprintf("/board/%s/projectitem/%s/edit", boardid, p.Id), "outerHTML", fmt.Sprintf("#projectitem-%s", p.Id))
         </div>
     </div>
