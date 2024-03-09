@@ -43,3 +43,21 @@ func CreateColumn(db *sql.DB, column column.Column) (int64, error) {
 
 	return columnid, nil
 }
+
+func GetItemCount(db *sql.DB, columnid string) (int, error) {
+	query, err := db.Query("select count(id) from projectitem where columnid = ?", columnid)
+	if err != nil {
+		return -1, err
+	}
+
+	defer query.Close()
+	var count int
+
+	for query.Next() {
+		if err := query.Scan(&count); err != nil {
+			return -1, err
+		}
+	}
+
+	return count, nil
+}

@@ -48,6 +48,11 @@ func Init(database *sql.DB) *echo.Echo {
 		validate.GET("/spenttime", validateSpenttime)
 	}
 
+	column := e.Group("/column")
+	{
+		column.GET("/count/:columnid", getColumnCount)
+	}
+
 	return e
 }
 

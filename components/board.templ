@@ -5,6 +5,7 @@ import (
 	"gokanban/structs/project"
     "gokanban/structs/column"
 	"fmt"
+    "strconv"
 	"gokanban/structs/projectitem"
 	"gokanban/structs/selectitem"
 )
@@ -60,6 +61,11 @@ templ Board(b board.BoardViewModel) {
 templ Column(col column.ColumnViewModel, i int) {
     <div class={ getColumnStyle(col) }>
         <h3>{ col.Title }</h3>
+        <div class="counter"
+            hx-get={fmt.Sprintf("/column/count/%s", col.Id)} 
+            hx-trigger="board-updated from:body">
+            @Counter(strconv.Itoa(len(col.ProjectItems)))
+        </div>
         @ProjectItems(col, i)
     </div>
 }

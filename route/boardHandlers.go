@@ -10,7 +10,6 @@ import (
 	"gokanban/structs/board"
 	"gokanban/structs/column"
 	"slices"
-	"strconv"
 	s "strconv"
 	"time"
 
@@ -21,7 +20,7 @@ import (
 func getProjectBoards(c echo.Context) error {
 	db := c.(*kanbanContext).db
 	projectid := c.Param("id")
-	if _, err := strconv.ParseInt(projectid, 10, 64); err != nil {
+	if _, err := s.ParseInt(projectid, 10, 64); err != nil {
 		return c.JSON(400, "Bad request")
 	}
 
@@ -79,6 +78,12 @@ func getProjectBoard(c echo.Context) error {
 	board.Columns = append(board.Columns, columns...)
 
 	cmp := components.Board(*board.ToViewModel())
+
+	trigger := c.Request().Header.Get("HX-Trigger")
+	if len(trigger) > 0 {
+		c.Response().Header().Set("HX-Trigger", trigger)
+	}
+
 	return View(c, cmp)
 }
 
@@ -87,7 +92,7 @@ func createProjectBoard(c echo.Context) error {
 	if len(id) == 0 {
 		return c.JSON(400, "Bad request")
 	}
-	projectid, err := strconv.Atoi(id)
+	projectid, err := s.Atoi(id)
 	if err != nil {
 		return c.JSON(400, "Bad request")
 	}

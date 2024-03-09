@@ -144,6 +144,8 @@ func updateProjectItem(c echo.Context) error {
 		return c.NoContent(500)
 	}
 
+	c.Response().Header().Set("HX-Trigger", "board-updated")
+
 	return c.Redirect(303, fmt.Sprintf("/board/%s", boardid))
 }
 
