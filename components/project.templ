@@ -6,7 +6,7 @@ import (
 )
 
 templ Projectcards(items []project.ProjectViewModel) {
-	<div 
+	<div
 		hx-get="/"
 		hx-trigger="project-updated from:body"
 		hx-target="this"
