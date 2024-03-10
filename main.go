@@ -1,24 +1,19 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"gokanban/db"
 	"gokanban/route"
-
-	"github.com/labstack/echo/v4"
+	"gokanban/services"
 )
-
-type kanbanContext struct {
-	echo.Context
-	db *sql.DB
-}
 
 func main() {
 	database, err := db.Connect()
 	catch(err)
 
-	e := route.Init(database)
+	ps := new(services.ProjectService)
+
+	e := route.Init(database, *ps)
 	e.Logger.Fatal(e.Start(":1337"))
 }
 

@@ -109,7 +109,7 @@ func createProjectBoard(c echo.Context) error {
 		return c.JSON(500, "Internal server error")
 	}
 
-	standardColumns := getStandardColumns(boardid)
+	standardColumns := helpers.GetStandardColumns(boardid)
 	for _, col := range standardColumns {
 		_, err := dbcolumn.CreateColumn(db, col)
 		if err != nil {
@@ -118,32 +118,6 @@ func createProjectBoard(c echo.Context) error {
 	}
 
 	return c.Redirect(303, "/project/"+id+"/board")
-}
-
-func getStandardColumns(boardid int64) []column.Column {
-	return []column.Column{
-		{
-			Title:       "New",
-			ColumnType:  0,
-			ColumnOrder: 0,
-			Created:     time.Time{},
-			BoardId:     boardid,
-		},
-		{
-			Title:       "In progress",
-			ColumnType:  1,
-			ColumnOrder: 1,
-			Created:     time.Time{},
-			BoardId:     boardid,
-		},
-		{
-			Title:       "Done",
-			ColumnType:  2,
-			ColumnOrder: 2,
-			Created:     time.Time{},
-			BoardId:     boardid,
-		},
-	}
 }
 
 func compareColumnOrder(a, b column.Column) int {

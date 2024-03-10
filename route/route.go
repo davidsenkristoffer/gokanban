@@ -2,16 +2,17 @@ package route
 
 import (
 	"database/sql"
+	"gokanban/services"
 
 	"github.com/labstack/echo/v4"
 )
 
-func Init(database *sql.DB) *echo.Echo {
+func Init(database *sql.DB, ps services.ProjectService) *echo.Echo {
 	e := echo.New()
 
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cc := &kanbanContext{c, database}
+			cc := &kanbanContext{c, database, ps}
 			return next(cc)
 		}
 	})
@@ -60,4 +61,5 @@ func Init(database *sql.DB) *echo.Echo {
 type kanbanContext struct {
 	echo.Context
 	db *sql.DB
+	ps services.ProjectService
 }

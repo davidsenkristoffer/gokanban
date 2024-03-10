@@ -9,6 +9,7 @@ import (
 	"gokanban/structs/projectitem"
 	s "strconv"
 	"strings"
+	t "time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -40,4 +41,13 @@ func FilterColumns(cols []column.Column, searchString string) []column.Column {
 		}
 	}
 	return cols
+}
+
+func CreateBoardStub(title string, projectid int64) *board.Board {
+	return &board.Board{
+		Title:     title,
+		ProjectId: int(projectid),
+		Created:   t.Now(),
+		Columns:   []column.Column{},
+	}
 }

@@ -6,11 +6,18 @@ import (
 )
 
 templ Projectcards(items []project.ProjectViewModel) {
-	<ul class="projectcards">
-		for _, p := range items {
-			@Projectcard(p)
-		}
-	</ul>
+	<div 
+		hx-get="/"
+		hx-trigger="project-updated from:body"
+		hx-target="this"
+		hx-select="#projects"
+	>
+		<ul class="projectcards" id="projects">
+			for _, p := range items {
+				@Projectcard(p)
+			}
+		</ul>
+	</div>
 }
 
 templ Projectcard(p project.ProjectViewModel) {
