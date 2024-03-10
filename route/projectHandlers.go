@@ -61,6 +61,23 @@ func createProject(c echo.Context) error {
 	return c.NoContent(201)
 }
 
+func deleteProject(c echo.Context) error {
+	projectid := c.Param("id")
+	if _, err := helpers.VerifyProjectId(projectid); err != nil {
+		return c.NoContent(400)
+	}
+
+	db := c.(*kanbanContext).db
+	ps := c.(*kanbanContext).ps
+
+	err := ps.DeleteProject(db, projectid)
+	if err != nil {
+		return c.NoContent(500)
+	}
+
+	return c.NoContent(204)
+}
+
 func View(c echo.Context, cmp templ.Component) error {
 	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
 	return cmp.Render(c.Request().Context(), c.Response().Writer)

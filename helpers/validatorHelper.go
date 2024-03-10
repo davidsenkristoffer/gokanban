@@ -3,8 +3,8 @@ package helpers
 import (
 	"fmt"
 	"gokanban/structs/projectitem"
-	strc "strconv"
-	s "strings"
+	s "strconv"
+	str "strings"
 )
 
 func ValidateProjectItem(p projectitem.ProjectItemViewModel) (map[string][]string, bool) {
@@ -50,7 +50,7 @@ func ValidateDescription(description string) []string {
 
 func ValidateTime(estimatedtime string) []string {
 	errors := []string{}
-	parsedInt, err := strc.ParseInt(estimatedtime, 10, 64)
+	parsedInt, err := s.ParseInt(estimatedtime, 10, 64)
 	if err != nil {
 		errors = append(errors, "Verdien må være et heltall")
 		return errors
@@ -66,10 +66,10 @@ func ValidateTime(estimatedtime string) []string {
 
 func validateNumberRange(value int, min int, max int) error {
 	if value < min {
-		return fmt.Errorf("Verdien må være større enn %d", min)
+		return fmt.Errorf("verdien må være større enn %d", min)
 	}
 	if value > max {
-		return fmt.Errorf("Verdien må være mindre enn %d", max)
+		return fmt.Errorf("verdien må være mindre enn %d", max)
 	}
 
 	return nil
@@ -79,7 +79,7 @@ func validateIllegalChars(value string) []string {
 	illegalChars := []string{"<", ">", "~", "$", "{", "}", "%"}
 	errors := []string{}
 	for _, char := range illegalChars {
-		if s.ContainsAny(value, char) {
+		if str.ContainsAny(value, char) {
 			errors = append(errors, fmt.Sprintf("Verdien inneholder et ulovlig tegn: %s", char))
 		}
 	}

@@ -12,6 +12,8 @@ import (
 type IProjectService interface {
 	GetProjects(db *sql.DB) ([]project.ProjectViewModel, error)
 	GetProject(db *sql.DB, projectid string) (project.ProjectViewModel, error)
+	CreateProject(db *sql.DB, project *project.Project) (int64, error)
+	DeleteProject(db *sql.DB, projectid string) error
 }
 
 type ProjectService struct{}
@@ -60,4 +62,13 @@ func (p ProjectService) CreateProject(db *sql.DB, project *project.Project) (int
 	}
 
 	return projectid, nil
+}
+
+func (p ProjectService) DeleteProject(db *sql.DB, projectid string) error {
+	err := dbproject.DeleteProject(db, projectid)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

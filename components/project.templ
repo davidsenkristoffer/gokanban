@@ -11,6 +11,7 @@ templ Projectcards(items []project.ProjectViewModel) {
 		hx-trigger="project-updated from:body"
 		hx-target="this"
 		hx-select="#projects"
+		hx-disinherit="hx-trigger hx-target hx-select"
 	>
 		<ul class="projectcards" id="projects">
 			for _, p := range items {

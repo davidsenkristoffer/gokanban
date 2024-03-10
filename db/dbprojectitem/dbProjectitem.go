@@ -74,6 +74,8 @@ func DeleteProjectItem(db *sql.DB, id int) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+	defer stmt.Close()
+
 	res, err := stmt.Exec(id)
 	if err != nil {
 		return 0, err

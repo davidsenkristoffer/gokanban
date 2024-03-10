@@ -25,6 +25,7 @@ func Init(database *sql.DB, ps services.ProjectService) *echo.Echo {
 		project.GET("/new", newProject)
 		project.POST("/new", createProject)
 		project.GET("/:id/card", getProject)
+		project.DELETE("/:id", deleteProject)
 
 		project.GET("/:id/board", getProjectBoards)
 		project.POST("/:id/board", createProjectBoard)

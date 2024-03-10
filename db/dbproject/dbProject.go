@@ -54,3 +54,23 @@ func CreateProject(db *sql.DB, project project.Project) (int64, error) {
 
 	return id, nil
 }
+
+func DeleteProject(db *sql.DB, projectid string) error {
+	stmt, err := db.Prepare("delete from project where id = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.Exec(projectid)
+	if err != nil {
+		return err
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

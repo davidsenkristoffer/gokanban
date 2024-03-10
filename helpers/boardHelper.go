@@ -35,7 +35,7 @@ func FilterColumns(cols []column.Column, searchString string) []column.Column {
 	if len(searchString) > 0 {
 		for i, col := range cols {
 			filteredItems := Filter(col.Items, func(p projectitem.ProjectItem) bool {
-				return strings.Contains(p.Title, searchString)
+				return strings.Contains(strings.ToLower(p.Title), strings.ToLower(searchString))
 			})
 			cols[i].Items = filteredItems
 		}

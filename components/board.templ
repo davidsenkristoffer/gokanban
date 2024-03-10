@@ -11,6 +11,7 @@ import (
 )
 
 templ Kanban(p project.ProjectViewModel) {
+	<!DOCTYPE html>
 	<html>
 		<head>
 			<link rel="stylesheet" href="/static/style.css"/>
@@ -18,20 +19,14 @@ templ Kanban(p project.ProjectViewModel) {
 			<meta name="htmx-config" content='{"globalViewTransitions":"true"}'/>
 		</head>
 		<body hx-boost="true">
-			<main>
-				<h1>{ p.Title }</h1>
-				<div class="boards">
-					for _, b := range p.Boards {
-						@Board(b)
-					}
-				</div>
-			</main>
+			@Boards(p)
 		</body>
 	</html>
 }
 
 templ Boards(p project.ProjectViewModel) {
 	<main>
+		<a href="/">Tilbake til start</a>
 		<h1>{ p.Title }</h1>
 		<div class="boards">
 			for _, b := range p.Boards {
