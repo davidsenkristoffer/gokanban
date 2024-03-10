@@ -1,36 +1,36 @@
 package components
 
 import (
-    "gokanban/structs/project"
-    "fmt"
+	"gokanban/structs/project"
+	"fmt"
 )
 
 templ Projectcards(items []project.ProjectViewModel) {
-    <ul class="projectcards">
-        for _, p := range items {
-            @Projectcard(p)
-        }
-    </ul>
+	<ul class="projectcards">
+		for _, p := range items {
+			@Projectcard(p)
+		}
+	</ul>
 }
 
 templ Projectcard(p project.ProjectViewModel) {
-    <li>
-        <a href={ templ.URL(fmt.Sprintf("/project/%s/board", p.Id)) }>
-            <div class="card">
-                <h2>{ p.Title }</h2>
-                <p>{ p.Description }</p>
-                <p>Opprettet: <time>{ p.Created }</time></p>
-            </div>
-        </a>
-    </li>
+	<li>
+		<a href={ templ.URL(fmt.Sprintf("/project/%s/board", p.Id)) }>
+			<div class="card">
+				<h2>{ p.Title }</h2>
+				<p>{ p.Description }</p>
+				<p>Opprettet: <time>{ p.Created }</time></p>
+			</div>
+		</a>
+	</li>
 }
 
 templ CreateNewProject() {
-    <div>
-        <form hx-post="/project/new" hx-target="previous ul" hx-swap="beforeend">
-            Tittel: <input type="text" name="title" />
-            Beskrivelse: <textarea rows="5" cols="10" name="description"></textarea>
-            <button type="submit">Opprett</button>
-        </form>
-    </div>
+	<div>
+		<form hx-post="/project/new" hx-target="previous ul" hx-swap="beforeend">
+			Tittel: <input type="text" name="title"/>
+			Beskrivelse: <textarea rows="5" cols="10" name="description"></textarea>
+			<button type="submit">Opprett</button>
+		</form>
+	</div>
 }

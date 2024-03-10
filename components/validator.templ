@@ -1,9 +1,9 @@
 package components
 
 templ DisplayErrors(errors []string) {
-    if len(errors) > 0 {
-        for _, e := range errors {
-            <li>{e}</li>
-        }
-    }
+	if len(errors) > 0 {
+		for _, e := range errors {
+			<li>{ e }</li>
+		}
+	}
 }
