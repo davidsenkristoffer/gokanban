@@ -42,12 +42,23 @@ templ Boards(p project.ProjectViewModel) {
 }
 
 templ Board(b board.BoardViewModel) {
-    <details open class="board" id={"board-"+b.Id}>
+    <details open?={true} class="board" id={"board-"+b.Id}>
         <summary class="board_summary">
             { b.Title }
         </summary>
         <div class="details_content">
-            <ol class="columns">
+            <div class="board_toolbar">
+                <label for="board-search">Filtrer saker: </label>
+                <input type="search" id="board-search" name="q"
+                    hx-get={fmt.Sprintf("/project/%s/board", b.ProjectId)}
+                    hx-trigger="keyup changed delay:400ms"
+                    hx-target={fmt.Sprintf("#board_columns-%s", b.Id)}
+                    hx-select={fmt.Sprintf("#board_columns-%s", b.Id)}
+                    hx-push-url="true"
+                    hx-swap="outerHTML"
+                />
+            </div>
+            <ol class="columns" id={fmt.Sprintf("board_columns-%s", b.Id)}>
                 for i, col := range b.Columns {
                     <li>
                         @Column(col, i)
@@ -60,9 +71,9 @@ templ Board(b board.BoardViewModel) {
 
 templ Column(col column.ColumnViewModel, i int) {
     <div class={ getColumnStyle(col) }>
-        <h3>{ col.Title }</h3>
+        <h3>{col.Title}</h3>
         <div class="counter"
-            hx-get={fmt.Sprintf("/column/count/%s", col.Id)}
+            hx-get={fmt.Sprintf("/column/%s/count", col.Id)}
             hx-trigger={fmt.Sprintf("column-updated-%s from:body", col.Id)}>
             @Counter(strconv.Itoa(len(col.ProjectItems)))
         </div>
@@ -72,7 +83,7 @@ templ Column(col column.ColumnViewModel, i int) {
             @ProjectItems(col, i)
         </ol>
         if i == 0 {
-            @Plus(fmt.Sprintf("/board/%s/projectitem/%s/new", col.BoardId, col.Id), "beforeend", "previous ol")
+            @Plus(fmt.Sprintf("/board/%s/columns/%s/projectitem/new", col.BoardId, col.Id), "beforeend", "previous ol")
         }
     </div>
 }
@@ -105,7 +116,7 @@ templ ProjectItem(p projectitem.ProjectItemViewModel, boardid string) {
 }
 
 templ CreateProjectItem(p projectitem.ProjectItemViewModel, boardid string, validations map[string][]string) {
-    <form class="projectitem" hx-post={fmt.Sprintf("/board/%s/projectitem/%s/new", boardid, p.ColumnId)} hx-swap="outerHTML">
+    <form class="projectitem" hx-post={fmt.Sprintf("/board/%s/columns/%s/projectitem/new", boardid, p.ColumnId)} hx-swap="outerHTML">
         Tittel: <input type="text" name="title" value={p.Title}
                     hx-get="/validate/title" 
                     hx-target="next .errors"
@@ -176,7 +187,7 @@ templ EditProjectItem(p projectitem.ProjectItemViewModel, boardid string, valida
         <div class="projectitem_editbuttons">
             <button type="submit">Oppdater</button>
             <button 
-                hx-get={fmt.Sprintf("/board/%s/projectitem/%s", boardid, p.Id)} 
+                hx-get={fmt.Sprintf("/board/%s/columns/%s/projectitem/%s", boardid, p.ColumnId, p.Id)} 
                 hx-swap="outerHTML"
                 hx-target={"#editprojectitem-"+p.Id}>
                 Avbryt

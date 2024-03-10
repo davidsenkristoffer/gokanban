@@ -17,7 +17,7 @@ func GetBoard(db *sql.DB, id int64) (*board.Board, error) {
 }
 
 func GetBoards(db *sql.DB, projectid string) ([]board.Board, error) {
-	stmt, err := db.Query("select id, title, created from board where projectid = ?", projectid)
+	stmt, err := db.Query("select id, title, projectid, created from board where projectid = ?", projectid)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func GetBoards(db *sql.DB, projectid string) ([]board.Board, error) {
 	boards := []board.Board{}
 	for stmt.Next() {
 		board := new(board.Board)
-		err = stmt.Scan(&board.ID, &board.Title, &board.Created)
+		err = stmt.Scan(&board.ID, &board.Title, &board.ProjectId, &board.Created)
 		if err != nil {
 			return nil, err
 		}

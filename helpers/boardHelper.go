@@ -6,7 +6,9 @@ import (
 	"gokanban/db/dbprojectitem"
 	"gokanban/structs/board"
 	"gokanban/structs/column"
+	"gokanban/structs/projectitem"
 	s "strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -26,4 +28,16 @@ func GetColumns(db *sql.DB, c echo.Context, b board.Board) ([]column.Column, err
 	}
 
 	return columns, nil
+}
+
+func FilterColumns(cols []column.Column, searchString string) []column.Column {
+	if len(searchString) > 0 {
+		for i, col := range cols {
+			filteredItems := Filter(col.Items, func(p projectitem.ProjectItem) bool {
+				return strings.Contains(p.Title, searchString)
+			})
+			cols[i].Items = filteredItems
+		}
+	}
+	return cols
 }

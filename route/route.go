@@ -32,9 +32,9 @@ func Init(database *sql.DB) *echo.Echo {
 	board := e.Group("/board")
 	{
 		board.GET("/:boardid", getProjectBoard)
-		board.GET("/:boardid/projectitem/:projectitemid", getProjectItem)
-		board.GET("/:boardid/projectitem/:columnid/new", createProjectItemForm)
-		board.POST("/:boardid/projectitem/:columnid/new", createProjectItem)
+		board.GET("/:boardid/columns/:columnid/projectitem/:projectitemid", getProjectItem)
+		board.GET("/:boardid/columns/:columnid/projectitem/new", createProjectItemForm)
+		board.POST("/:boardid/columns/:columnid/projectitem/new", createProjectItem)
 		board.GET("/:boardid/projectitem/:projectitemid/edit", updateProjectItemForm)
 		board.PUT("/:boardid/projectitem/:projectitemid/edit", updateProjectItem)
 		board.DELETE("/:boardid/columns/:columnid/projectitem/:projectitemid", deleteProjectItem)
@@ -51,7 +51,7 @@ func Init(database *sql.DB) *echo.Echo {
 
 	column := e.Group("/column")
 	{
-		column.GET("/count/:columnid", getColumnCount)
+		column.GET("/:columnid/count", getColumnCount)
 	}
 
 	return e

@@ -19,6 +19,7 @@ import (
 
 func getProjectBoards(c echo.Context) error {
 	db := c.(*kanbanContext).db
+	searchString := c.QueryParam("q")
 	projectid := c.Param("id")
 	if _, err := s.ParseInt(projectid, 10, 64); err != nil {
 		return c.JSON(400, "Bad request")
@@ -40,8 +41,10 @@ func getProjectBoards(c echo.Context) error {
 			c.Logger().Errorf("Error while selecting columns for board %d: %s", b.ID, err)
 			continue
 		} else {
+			filteredCols := helpers.FilterColumns(columns, searchString)
+
 			slices.SortFunc(columns, compareColumnOrder)
-			boards[i].Columns = append(boards[i].Columns, columns...)
+			boards[i].Columns = append(boards[i].Columns, filteredCols...)
 		}
 	}
 	project.Boards = boards
@@ -74,8 +77,11 @@ func getProjectBoard(c echo.Context) error {
 		return c.NoContent(404)
 	}
 
+	searchString := c.QueryParam("q")
+	filteredCols := helpers.FilterColumns(columns, searchString)
+
 	slices.SortFunc(columns, compareColumnOrder)
-	board.Columns = append(board.Columns, columns...)
+	board.Columns = append(board.Columns, filteredCols...)
 
 	cmp := components.Board(*board.ToViewModel())
 

@@ -137,3 +137,11 @@ details[open] > summary {
 .column_two {
     border-color: var(--mint-green);
 }
+
+.board_toolbar {
+    width: 100%;
+    text-align: end;
+    margin: 1em 0;
+    padding: 0.5em 0;
+    border-bottom: 1px dotted;
+}
