@@ -15,22 +15,20 @@ templ Projectcards(items []project.ProjectViewModel) {
 	>
 		<ul class="projectcards" id="projects">
 			for _, p := range items {
-				@Projectcard(p)
+				<li>
+					@Projectcard(p)
+				</li>
 			}
 		</ul>
 	</div>
 }
 
 templ Projectcard(p project.ProjectViewModel) {
-	<li>
-		<a href={ templ.URL(fmt.Sprintf("/project/%s/board", p.Id)) }>
-			<div class="card">
-				<h2>{ p.Title }</h2>
-				<p>{ p.Description }</p>
-				<p>Opprettet: <time>{ p.Created }</time></p>
-			</div>
-		</a>
-	</li>
+	<div class="card">
+		<h2>{ p.Title }</h2>
+		<p>{ p.Description }</p>
+		<a href={ templ.URL(fmt.Sprintf("/project/%s/board", p.Id)) }>Gå til prosjekt</a>
+	</div>
 }
 
 templ CreateNewProject() {
