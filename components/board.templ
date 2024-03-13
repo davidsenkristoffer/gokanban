@@ -69,7 +69,19 @@ templ Board(b board.BoardViewModel) {
 
 templ Column(col column.ColumnViewModel, i int) {
 	<div class={ getColumnStyle(col) }>
-		<h3>{ col.Title }</h3>
+		<div class="column_top">
+			<h3 class="column_header">{ col.Title }</h3>
+			if i == 0 {
+				<button 
+					id="projectitem_create"
+					hx-get={fmt.Sprintf("/board/%s/columns/%s/projectitem/new", col.BoardId, col.Id)} 
+					hx-swap="beforeend" 
+					hx-target="next ol"
+					hx-on::after-request="this.disabled = true;">
+					@Plus()
+				</button>
+			}
+		</div>
 		<div
 			class="counter"
 			hx-get={ fmt.Sprintf("/column/%s/count", col.Id) }
@@ -84,9 +96,6 @@ templ Column(col column.ColumnViewModel, i int) {
 		>
 			@ProjectItems(col, i)
 		</ol>
-		if i == 0 {
-			@Plus(fmt.Sprintf("/board/%s/columns/%s/projectitem/new", col.BoardId, col.Id), "beforeend", "previous ol")
-		}
 	</div>
 }
 
@@ -118,8 +127,12 @@ templ ProjectItem(p projectitem.ProjectItemViewModel, boardid string) {
 }
 
 templ CreateProjectItem(p projectitem.ProjectItemViewModel, boardid string, validations map[string][]string) {
-	<form class="projectitem" hx-post={ fmt.Sprintf("/board/%s/columns/%s/projectitem/new", boardid, p.ColumnId) } hx-swap="outerHTML">
-		Tittel: <input
+	<form class="projectitem" 
+		hx-post={ fmt.Sprintf("/board/%s/columns/%s/projectitem/new", boardid, p.ColumnId) } 
+		hx-swap="outerHTML" 
+		hx-on::after-request="htmx.find('#projectitem_create').disabled = false;"
+	>
+		Tittel: <input 
 	type="text"
 	name="title"
 	value={ p.Title }
