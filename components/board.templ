@@ -72,12 +72,13 @@ templ Column(col column.ColumnViewModel, i int) {
 		<div class="column_top">
 			<h3 class="column_header">{ col.Title }</h3>
 			if i == 0 {
-				<button 
+				<button
 					id="projectitem_create"
-					hx-get={fmt.Sprintf("/board/%s/columns/%s/projectitem/new", col.BoardId, col.Id)} 
-					hx-swap="beforeend" 
+					hx-get={ fmt.Sprintf("/board/%s/columns/%s/projectitem/new", col.BoardId, col.Id) }
+					hx-swap="beforeend"
 					hx-target="next ol"
-					hx-on::after-request="this.disabled = true;">
+					hx-on::after-request="this.disabled = true;"
+				>
 					@Plus()
 				</button>
 			}
@@ -127,12 +128,13 @@ templ ProjectItem(p projectitem.ProjectItemViewModel, boardid string) {
 }
 
 templ CreateProjectItem(p projectitem.ProjectItemViewModel, boardid string, validations map[string][]string) {
-	<form class="projectitem" 
-		hx-post={ fmt.Sprintf("/board/%s/columns/%s/projectitem/new", boardid, p.ColumnId) } 
-		hx-swap="outerHTML" 
+	<form
+		class="projectitem"
+		hx-post={ fmt.Sprintf("/board/%s/columns/%s/projectitem/new", boardid, p.ColumnId) }
+		hx-swap="outerHTML"
 		hx-on::after-request="htmx.find('#projectitem_create').disabled = false;"
 	>
-		Tittel: <input 
+		Tittel: <input
 	type="text"
 	name="title"
 	value={ p.Title }
