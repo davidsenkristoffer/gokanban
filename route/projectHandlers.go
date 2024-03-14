@@ -80,5 +80,6 @@ func deleteProject(c echo.Context) error {
 
 func View(c echo.Context, cmp templ.Component) error {
 	c.Response().Header().Set("Content-Type", "text/html; charset=utf-8")
+	c.Response().Header().Set("Cache-Control", "no-cache")
 	return cmp.Render(c.Request().Context(), c.Response().Writer)
 }

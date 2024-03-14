@@ -193,6 +193,9 @@ func createProjectItemForm(c echo.Context) error {
 		ColumnId:      columnid,
 	}
 
+	bytearr := []byte(fmt.Sprintf("%v", p))
+	c.Response().Header().Set("Etag", helpers.GenerateETag(bytearr, false))
+
 	cmp := components.CreateProjectItem(*p, boardid, make(map[string][]string))
 	return View(c, cmp)
 }
