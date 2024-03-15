@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"gokanban/structs/projectitem"
 	"gokanban/structs/selectitem"
+	"gokanban/structs"
 )
 
 templ Kanban(p project.ProjectViewModel) {
@@ -26,7 +27,10 @@ templ Kanban(p project.ProjectViewModel) {
 
 templ Boards(p project.ProjectViewModel) {
 	<main>
-		<a href="/">Tilbake til start</a>
+		<div class="top_links">
+			<a href="/">Tilbake til start</a>
+			<a href="/admin">Adminpanel</a>
+		</div>
 		<h1>{ p.Title }</h1>
 		<div class="boards">
 			for _, b := range p.Boards {
@@ -121,28 +125,32 @@ templ ProjectItem(p projectitem.ProjectItemViewModel, boardid string) {
 		<p>Estimert tid: <b>{ p.EstimatedTime }</b></p>
 		<p>Tidsbruk: <b>{ p.SpentTime }</b></p>
 		<div class="projectitem_toolbar">
-			@DeleteIcon(fmt.Sprintf("/board/%s/columns/%s/projectitem/%s", boardid, p.ColumnId, p.Id), "delete", fmt.Sprintf("#projectitem-%s", p.Id))
-			@EditIcon(fmt.Sprintf("/board/%s/projectitem/%s/edit", boardid, p.Id), "outerHTML", fmt.Sprintf("#projectitem-%s", p.Id))
+			<div>
+				for _, tag := range p.Taglist {
+					@AdminTag(tag)
+				}
+			</div>
+			<div>
+				@EditIcon(fmt.Sprintf("/board/%s/projectitem/%s/edit", boardid, p.Id), "outerHTML", fmt.Sprintf("#projectitem-%s", p.Id))
+				@DeleteIcon(fmt.Sprintf("/board/%s/columns/%s/projectitem/%s", boardid, p.ColumnId, p.Id), "delete", fmt.Sprintf("#projectitem-%s", p.Id))
+			</div>
 		</div>
 	</div>
 }
 
-templ CreateProjectItem(p projectitem.ProjectItemViewModel, boardid string, validations map[string][]string) {
+templ CreateProjectItem(p projectitem.ProjectItemViewModel, boardid string, validations map[string][]string, tags []structs.TagViewModel) {
 	<form
 		class="projectitem"
 		hx-post={ fmt.Sprintf("/board/%s/columns/%s/projectitem/new", boardid, p.ColumnId) }
 		hx-swap="outerHTML"
 		hx-on::after-request="htmx.find('#projectitem_create').disabled = false;"
 	>
-		Tittel: <input
-	type="text"
-	name="title"
-	value={ p.Title }
-	hx-get="/validate/title"
-	hx-target="next .errors"
-	hx-swap="innerHTML"
-	hx-trigger="keyup delay:300ms changed"
-/>
+		Tittel: <input type="text" name="title" value={ p.Title }
+			hx-get="/validate/title"
+			hx-target="next .errors"
+			hx-swap="innerHTML"
+			hx-trigger="keyup delay:300ms changed"
+		/>
 		@ErrorList(validations["title"])
 		Beskrivelse: 
 		<textarea
@@ -158,15 +166,20 @@ templ CreateProjectItem(p projectitem.ProjectItemViewModel, boardid string, vali
 		</textarea>
 		@ErrorList(validations["description"])
 		Estimert tidsbruk: <input
-	type="number"
-	name="estimatedtime"
-	value={ p.EstimatedTime }
-	hx-get="/validate/estimatedtime"
-	hx-target="next .errors"
-	hx-swap="innerHTML"
-	hx-trigger="keyup delay:300ms changed"
-/>
+			type="number"
+			name="estimatedtime"
+			value={ p.EstimatedTime }
+			hx-get="/validate/estimatedtime"
+			hx-target="next .errors"
+			hx-swap="innerHTML"
+			hx-trigger="keyup delay:300ms changed"
+		/>
 		@ErrorList(validations["estimatedtime"])
+		Tag: <select name="tag">
+			for _, tag := range tags {
+				<option value={tag.Id}>{tag.Label}</option>
+			}
+		</select>
 		<button type="submit">Opprett</button>
 	</form>
 }

@@ -6,6 +6,7 @@ import (
 	"gokanban/db/dbcolumn"
 	"gokanban/db/dbprojectitem"
 	"gokanban/helpers"
+	"gokanban/structs"
 	"gokanban/structs/projectitem"
 	"gokanban/structs/selectitem"
 	"strconv"
@@ -29,14 +30,9 @@ func getProjectItem(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	pvm := *p.ToViewModel()
 
-	headers := c.Request().Header
-	trigger := headers.Get("HX-Trigger")
-	if len(trigger) > 0 {
-		c.Response().Header().Set("HX-Trigger", trigger)
-	}
-
-	cmp := components.ProjectItem(*p.ToViewModel(), boardid)
+	cmp := components.ProjectItem(pvm, boardid)
 	return View(c, cmp)
 }
 
@@ -53,13 +49,21 @@ func createProjectItem(c echo.Context) error {
 	pvm := &projectitem.ProjectItemViewModel{
 		Title:         c.FormValue("title"),
 		Description:   c.FormValue("description"),
+		Tags:          c.FormValue("tag"),
 		EstimatedTime: c.FormValue("estimatedtime"),
 		ColumnId:      columnid,
 	}
 
 	validation, containsErrors := helpers.ValidateProjectItem(*pvm)
 	if containsErrors {
-		cmp := components.CreateProjectItem(*pvm, boardid, validation)
+		ts := c.(*kanbanContext).ts
+		db := c.(*kanbanContext).db
+		tags, err := ts.GetTags(db)
+		if err != nil {
+			tags = make([]structs.TagViewModel, 0)
+		}
+
+		cmp := components.CreateProjectItem(*pvm, boardid, validation, tags)
 		return View(c, cmp)
 	}
 
@@ -139,6 +143,7 @@ func updateProjectItem(c echo.Context) error {
 		ID:            projectitemid,
 		Title:         pvm.Title,
 		Description:   pvm.Description,
+		Tags:          toUpdate.Tags,
 		EstimatedTime: estimatedTime,
 		SpentTime:     spentTime,
 		Created:       toUpdate.Created,
@@ -193,10 +198,17 @@ func createProjectItemForm(c echo.Context) error {
 		ColumnId:      columnid,
 	}
 
+	ts := c.(*kanbanContext).ts
+	db := c.(*kanbanContext).db
+	tags, err := ts.GetTags(db)
+	if err != nil {
+		tags = make([]structs.TagViewModel, 0)
+	}
+
 	bytearr := []byte(fmt.Sprintf("%v", p))
 	c.Response().Header().Set("Etag", helpers.GenerateETag(bytearr, false))
 
-	cmp := components.CreateProjectItem(*p, boardid, make(map[string][]string))
+	cmp := components.CreateProjectItem(*p, boardid, make(map[string][]string), tags)
 	return View(c, cmp)
 }
 
@@ -212,6 +224,7 @@ func updateProjectItemForm(c echo.Context) error {
 	db := c.(*kanbanContext).db
 	p, err := dbprojectitem.GetProjectItem(db, projectitemid)
 	if err != nil {
+		c.Logger().Error(err)
 		return c.NoContent(404)
 	}
 

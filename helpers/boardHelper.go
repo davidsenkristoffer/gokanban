@@ -25,6 +25,7 @@ func GetColumns(db *sql.DB, c echo.Context, b board.Board) ([]column.Column, err
 		if err != nil {
 			return nil, err
 		}
+
 		columns[j].Items = append(columns[j].Items, items...)
 	}
 

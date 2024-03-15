@@ -35,13 +35,18 @@ func Connect() (*sql.DB, error) {
 	itemStmt := `create table if not exists projectitem (
 		id integer not null primary key autoincrement, 
 		title text not null, 
-		description text, 
+		description text,
+		tags text, 
 		estimatedtime real, 
 		spenttime real, 
 		created datetime, 
 		updated datetime, 
 		columnid integer not null, 
 		foreign key (columnid) references column (id))`
+	tagStmt := `create table if not exists tag (
+		id integer not null primary key autoincrement,
+		label text not null,
+		color integer not null)`
 
 	if _, err = db.Exec(projectStmt); err != nil {
 		return nil, err
@@ -56,6 +61,10 @@ func Connect() (*sql.DB, error) {
 	}
 
 	if _, err = db.Exec(itemStmt); err != nil {
+		return nil, err
+	}
+
+	if _, err = db.Exec(tagStmt); err != nil {
 		return nil, err
 	}
 

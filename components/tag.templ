@@ -1,0 +1,56 @@
+package components
+
+import (
+    "gokanban/structs"
+    "fmt"
+)
+
+templ AdminTags(tags []structs.TagViewModel) {
+    <ul hx-get="/admin/tags" hx-trigger="tags-updated from:body">
+        @AdminTaglist(tags)
+    </ul>
+    <form hx-post="/admin/tags/new" hx-swap="none">
+        <label for="taglabel">Navn: </label>
+        <input type="text" id="taglabel" name="title" />
+        <label for="tagcolor">Velg farge:</label>
+        <select id="tagcolor" name="tagcolor">
+            for key, val := range GetStyles() {
+                <option value={key}>{val}</option>
+            }
+        </select>
+        <button type="submit">Opprett</button>
+    </form>
+}
+
+templ AdminTaglist(tags []structs.TagViewModel) {
+    for _, tag := range tags {
+        <li>
+            @AdminTag(tag)
+        </li>
+    }
+}
+
+templ AdminTag(tag structs.TagViewModel) {
+    <div class={fmt.Sprintf("chip %s", getChipStyle(tag))}>
+        { tag.Label }
+    </div>
+}
+
+func getChipStyle(tag structs.TagViewModel) string {
+    styles := GetStyles()
+    res := styles[tag.Color]
+    if len(res) == 0 {
+        res = "plain"
+    }
+
+    return res
+}
+
+func GetStyles() map[string]string {
+    return map[string]string {
+        "0": "ok",
+        "1": "info",
+        "2": "warn",
+        "3": "bad",
+    }
+}

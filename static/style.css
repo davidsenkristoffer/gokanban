@@ -1,10 +1,40 @@
 :root {
+    --gray-0: #f8fafb;
+    --gray-1: #f2f4f6;
+    --gray-4: #d1d6d8;
+    --red-1: #ffe3e3;
+    --red-11: #962020;
+    --blue-1: #d0ebff;
+    --blue-10: #145591;
+    --blue-11: #114678;
+    --green-1: #d3f9d8;
+    --green-11: #1b5727;
+    --yellow-1: #fff3bf;
+    --yellow-11: #804200;
     --dull-lavender: #A09FE6;
     --milan: #F5FFA2;
     --anakiwa: #9FD1FF;
     --hopbush: #CC759A;
     --vivid-tangerine: #FF8B8B;
     --mint-green: #AAFFA2;
+
+    --main-font: "Source Sans 3", -apple-system, system-ui, sans-serif;
+
+    --rhythm: 1.4rem;
+	--plain-bg: var(--gray-1);
+	--info-bg: var(--blue-1);
+	--ok-bg: var(--green-1);
+	--bad-bg: var(--red-1);
+	--warn-bg: var(--yellow-1);
+    --bg: var(--gray-0);
+	--box-bg: var(--plain-bg);
+	--interactive-bg: var(--gray-4);
+
+    --plain-fg: var(--blue-10);
+	--info-fg: var(--blue-11);
+	--ok-fg: var(--green-11);
+	--bad-fg: var(--red-11);
+	--warn-fg: var(--yellow-11);
 }
 
 html, body {
@@ -20,6 +50,11 @@ form {
 
 ul, ol {
     list-style-type: none;
+}
+
+.top-links {
+    display: flex;
+    justify-content: space-between;
 }
 
 .projectcards {
@@ -62,7 +97,7 @@ ul, ol {
 
 .projectitem_toolbar {
     display: flex;
-    flex-direction: row-reverse;
+    justify-content: space-between;
     margin-top: 0.5em;
     padding-top: 0.5em;
     border-top: 1px solid black;
@@ -157,4 +192,38 @@ details[open] > summary {
     margin: 1em 0;
     padding: 0.5em 0;
     border-bottom: 1px dotted;
+}
+
+.chip {
+    font-family: var(--main-font);
+    border: 1px solid var(--accent);
+    background: var(--box-bg);
+    border-radius: calc(var(--rhythm) / 2);
+    padding-inline: calc(var(--rhythm) / 2);
+    width: fit-content;
+}
+
+.plain {
+    --box-bg: var(--plain-bg);
+    --accent: var(--plain-fg);
+}
+
+.info {
+    --box-bg: var(--info-bg);
+    --accent: var(--info-fg);
+}
+
+.ok {
+    --box-bg: var(--ok-bg);
+    --accent: var(--ok-fg);
+}
+
+.warn {
+    --box-bg: var(--warn-bg);
+    --accent: var(--warn-fg);
+}
+
+.bad {
+    --box-bg: var(--bad-bg);
+    --accent: var(--bad-fg);
 }

@@ -7,12 +7,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Init(database *sql.DB, ps services.ProjectService) *echo.Echo {
+func Init(database *sql.DB, ps services.ProjectService, ts services.TagService) *echo.Echo {
 	e := echo.New()
 
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cc := &kanbanContext{c, database, ps}
+			cc := &kanbanContext{c, database, ps, ts}
 			return next(cc)
 		}
 	})
@@ -56,6 +56,14 @@ func Init(database *sql.DB, ps services.ProjectService) *echo.Echo {
 		column.GET("/:columnid/count", getColumnCount)
 	}
 
+	admin := e.Group("/admin")
+	{
+		admin.GET("", getAdminIndex)
+
+		admin.GET("/tags", getTags)
+		admin.POST("/tags/new", createTag)
+	}
+
 	return e
 }
 
@@ -63,4 +71,5 @@ type kanbanContext struct {
 	echo.Context
 	db *sql.DB
 	ps services.ProjectService
+	ts services.TagService
 }

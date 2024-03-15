@@ -12,8 +12,9 @@ func main() {
 	catch(err)
 
 	ps := new(services.ProjectService)
+	ts := new(services.TagService)
 
-	e := route.Init(database, *ps)
+	e := route.Init(database, *ps, *ts)
 	e.Logger.Fatal(e.Start(":1337"))
 }
 
