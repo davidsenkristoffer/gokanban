@@ -117,7 +117,7 @@ templ UpdatedProjectItems(items []projectitem.ProjectItemViewModel, boardid stri
 }
 
 templ ProjectItem(p projectitem.ProjectItemViewModel, boardid string) {
-	<div class="projectitem" id={ "projectitem-" + p.Id }>
+	<div class={getProjectItemStyle(p)} id={ "projectitem-" + p.Id }>
 		<h3>{ p.Title }</h3>
 		if len(p.Description) > 0 {
 			<p>{ p.Description }</p>
@@ -260,6 +260,12 @@ templ EditProjectItem(p projectitem.ProjectItemViewModel, boardid string, valida
 	</form>
 }
 
+templ ErrorList(values []string) {
+	<ul class="errors">
+		@DisplayErrors(values)
+	</ul>
+}
+
 func getColumnStyle(c column.ColumnViewModel) string {
 	switch c.ColumnType {
 	case 0:
@@ -271,8 +277,22 @@ func getColumnStyle(c column.ColumnViewModel) string {
 	}
 }
 
-templ ErrorList(values []string) {
-	<ul class="errors">
-		@DisplayErrors(values)
-	</ul>
+func getProjectItemStyle(p projectitem.ProjectItemViewModel) string {
+	style := "projectitem"
+	spenttime, err := strconv.Atoi(p.SpentTime)
+	if err != nil {
+		return style
+	}
+	estimatedtime, err := strconv.Atoi(p.EstimatedTime)
+	if err != nil {
+		return style
+	}
+
+	if estimatedtime * 3 < spenttime {
+		return style + " bad"
+	} else if estimatedtime < spenttime {
+		return style + " warn"
+	} else {
+		return style
+	}
 }
