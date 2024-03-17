@@ -38,7 +38,7 @@ templ Projectcard(p project.ProjectViewModel) {
 
 templ CreateNewProject() {
 	<div>
-		<form hx-post="/project/new" hx-target="#projects" hx-swap="beforeend">
+		<form hx-post="/project/new" hx-swap="delete">
 			Tittel: <input type="text" name="title"/>
 			Beskrivelse: <textarea rows="5" cols="10" name="description"></textarea>
 			<button type="submit">Opprett</button>
